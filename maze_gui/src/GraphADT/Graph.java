@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import javax.imageio.ImageIO;
 
 public class Graph<T> {
@@ -21,15 +20,13 @@ public class Graph<T> {
 	// 255 white
 	private final int Threshhold = 150;
 	private final int MAXSUPERPIXELAMOUNT = 16; // edges are usually 2 pixels on each end so 4 pixels per "Block"
-
-	///////////////////////////////////////////////////////////
-
 	private Vertex<SuperPixel> startVertex = null;
 	private Vertex<SuperPixel> endVertex = null;
-
-	///////////////////////////////////////////////////////////
-
-	// assume image passed though is already grey scaled
+ 
+	/**
+	 * assume image passed though is already grey scaled
+	 * @param FileName the filename
+	 */
 	public Graph(String FileName) {
 
 		BufferedImage ReadGrey = GreyScaleImage(FileName); // convert image to greyscale
@@ -72,8 +69,6 @@ public class Graph<T> {
 			}
 
 		}
-
-		
 		
 		// Create a copy of the original image to overlay edges
 		BufferedImage edgeOverlay = new BufferedImage(rgbImage.getWidth(), rgbImage.getHeight(),
@@ -86,7 +81,9 @@ public class Graph<T> {
 		for (Vertex<SuperPixel> Sp : this.SuperPixelList) {
 			for (Edge edge : Sp.EdgeList()) {
 				// Get the 'from' and 'to' vertices of the edge
+				@SuppressWarnings("unchecked")
 				Vertex<SuperPixel> fromVertex = edge.getVertFrom();
+				@SuppressWarnings("unchecked")
 				Vertex<SuperPixel> toVertex = edge.getVertTO();
 
 				// Extract coordinates of each vertex (centroids)
@@ -118,95 +115,163 @@ public class Graph<T> {
 		findStartAndEnd();
 	}
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	public List<Vertex<SuperPixel>> getVertices(){
-		return this.SuperPixelList;
-	}
-	
+	/**
+	 * Finds and sets the start and end SuperPixels based on their Pixel positions.
+	 * The start SuperPixel is the first one found that has a Pixel at the left edge (x = 0).  
+	 * The end SuperPixel is the first one found that has a Pixel at the right edge (x = Imgwidth - 1).
+	 * Once both are found, the method stops searching.
+	 */
 	public void findStartAndEnd() {
+	    // Goes through every SuperPixel in the list
+	    for (Vertex<SuperPixel> v : SuperPixelList) {
+	        // Goes through every Pixel in the current SuperPixel
+	        for (Pixel p : v.GetElement().getAllPixels()) {
+	            
+	            // Checks if this Pixel is on the left edge of the image
+	            if (startVertex == null && p.getXPos() == 0) {
+	                startVertex = v; // Set this SuperPixel as the start
+	            }
 
-		for (Vertex<SuperPixel> v : SuperPixelList) {
-			for (Pixel p : v.GetElement().getAllPixels()) {
-				if (p.getXPos() == 0) {
-					startVertex = v;
-					break;
-				}
-			}
-			if (startVertex != null)
-				break;
-		}
+	            // Checks if this Pixel is on the right edge of the image
+	            if (endVertex == null && p.getXPos() == Imgwidth - 1) {
+	                endVertex = v; // Set this SuperPixel as the end
+	            }
 
-		for (Vertex<SuperPixel> v : SuperPixelList) {
-			for (Pixel p : v.GetElement().getAllPixels()) {
-				if (p.getXPos() == Imgwidth - 1) {
-					endVertex = v;
-					break;
-				}
-			}
-			if (endVertex != null)
-				break;
-		}
+	            // If both start and end are found, stop searching
+	            if (startVertex != null && endVertex != null) {
+	                return;
+	            }
+	        }
+	    }
 	}
 
+
+	/**
+	 * Makes a path shorter by keeping only some of the points.
+	 * This method goes through the given path and keeps every 4th SuperPixel 
+	 * (or whatever value is set in STEP) to make the path simpler.
+	 * It also makes sure the last point in the original path is always included, 
+	 * even if it was skipped.
+	 * @param path The original list of SuperPixel vertices (the full path)
+	 * @return A shorter version of the path
+	 */
+	public List<Vertex<SuperPixel>> simplifyPath(List<Vertex<SuperPixel>> path) {
+	    // If the path has fewer than 2 points, return it as is - would'nt make sense to skip pixels if our path is that short
+	    if (path.size() < 2) return path;
+
+	    List<Vertex<SuperPixel>> simple = new ArrayList<>();
+
+	 // Only keep every 4th point from the path - (i was trying to minimise/reduce the  lines in the path)
+	    int STEP = 4;  
+
+	    // Go through the path, jumping by STEP each time
+	    for (int i = 0; i < path.size(); i += STEP) {
+	        simple.add(path.get(i)); // Add the selected point to the simplified path
+	    }
+
+	 // Get the last point in the original path - there'll be cases where we skip over the end vertex 
+	 //so we're trying to make sure that our path is connected from start - middle to end
+	    Vertex<SuperPixel> last = path.get(path.size() - 1); 
+
+	    // If the last point was not already added, add it now
+	    if (simple.get(simple.size() - 1) != last) {
+	        simple.add(last);
+	    }
+
+	 // Return the simplified path
+	    return simple; 
+	}
+
+	
+	/**
+	 * Finds a path from the start SuperPixel to the end SuperPixel using breadth-first search (BFS).
+	 * The method looks for the shortest path by checking all possible paths, step by step.
+	 * It returns the first path that reaches the end SuperPixel.
+	 * @return A list of SuperPixel vertices that form the path from start to end.
+	 *         If no path is found or start/end is missing, returns an empty list.
+	 */
 	public List<Vertex<SuperPixel>> findPath() {
 
-		if (startVertex == null || endVertex == null) {
-			return new ArrayList<>();
-		}
+	    // If start or end is not set, return an empty path
+	    if (startVertex == null || endVertex == null) 
+	    {
+	        return new ArrayList<>();
+	    }
 
-		LinkedQueue<List<Vertex<SuperPixel>>> queue = new LinkedQueue<>();
-		List<Vertex<SuperPixel>> visited = new ArrayList<>();
+	    // A queue to store paths to explore
+	    LinkedQueue<List<Vertex<SuperPixel>>> queue = new LinkedQueue<>();
 
-		List<Vertex<SuperPixel>> startPath = new ArrayList<>();
-		startPath.add(startVertex);
-		queue.Enqueue(startPath);
-		visited.add(startVertex);
+	    // A list to keep track of visited vertices
+	    List<Vertex<SuperPixel>> visited = new ArrayList<>();
 
-		while (!queue.isEmpty()) {
+	    // Start a new path from the start vertex
+	    List<Vertex<SuperPixel>> startPath = new ArrayList<>();
+	    startPath.add(startVertex);
+	    queue.Enqueue(startPath);        // Add the starting path to the queue
+	    visited.add(startVertex);        // Mark the start vertex as visited
 
-			// take the next path
-			List<Vertex<SuperPixel>> path = queue.Dequeue();
-			// look at its last vertex
-			Vertex<SuperPixel> v = path.get(path.size() - 1);
+	    // Keep going while there are paths to check
+	    while (!queue.isEmpty()) {
 
-			if (v == endVertex) {
-				return path;
-			}
+	        // Take the next path from the queue
+	        List<Vertex<SuperPixel>> path = queue.Dequeue();
 
-			for (Edge<SuperPixel> e : v.EdgeList()) {
+	        // Get the last vertex in the current path
+	        Vertex<SuperPixel> v = path.get(path.size() - 1);
 
-				Vertex<SuperPixel> w;
+	        // If we reached the end vertex, return the path
+	        if (v == endVertex) {
+	            return path;
+	        }
 
-				if (e.getVertFrom() == v) {
-					w = e.getVertTO();
-				} else {
-					w = e.getVertFrom();
-				}
+	        // Check all edges connected to this vertex
+	        for (Edge<SuperPixel> e : v.EdgeList()) {
 
-				if (!visited.contains(w)) {
-					visited.add(w);
-					List<Vertex<SuperPixel>> newPath = new ArrayList<>(path);
-					newPath.add(w);
-					queue.Enqueue(newPath);
-				}
-			}
-		}
+	            Vertex<SuperPixel> w;
 
-		// no path found
-		return new ArrayList<>();
+	            // Get the vertex on the other side of the edge
+	            if (e.getVertFrom() == v) {
+	                w = e.getVertTO();
+	            } else {
+	                w = e.getVertFrom();
+	            }
+
+	            // If we haven't visited this vertex yet
+	            if (!visited.contains(w)) {
+	                visited.add(w); // Mark it as visited
+
+	                // Create a new path that includes this vertex
+	                List<Vertex<SuperPixel>> newPath = new ArrayList<>(path);
+	                newPath.add(w);
+
+	                // Add the new path to the queue to be explored later
+	                queue.Enqueue(newPath);
+	            }
+	        }
+	    }
+
+	    // If no path is found, return an empty list
+	    return new ArrayList<>();
 	}
 
+
+	/**
+	 * Method for getting the starting vertex
+	 * @return startVertex
+	 */
 	public Vertex<SuperPixel> getStartVertex() {
 		return startVertex;
 	}
 
+
+	/**
+	 * Method for getting the end vertex
+	 * @return endVertex
+	 */
 	public Vertex<SuperPixel> getEndVertex() {
 		return endVertex;
 	}
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+ 
 	/**
 	 * Function to add superpixels to the adjacency list forming the graph structure
 	 * Takes in a superpixel,places it in a vertex and addds to list
@@ -259,8 +324,6 @@ public class Graph<T> {
 		edgecount++;
 
 	}
-
-
 
 	/**
 	 * Check if theres already an edge between 2 SuperPixels based on their ID
@@ -519,10 +582,6 @@ public class Graph<T> {
 		}
 
 	}
-	
-	
-	
-	
 
 	/**
 	 * Run a Breadth First Search from inital x and y pixel position adding more and more
@@ -577,7 +636,6 @@ public class Graph<T> {
 		SP.CalculateCetroids(); // Calculate the avg X and Y Pos for a SuperPixel
 
 		return SP;
-
 	}
 
 	/**
@@ -596,7 +654,6 @@ public class Graph<T> {
 			BufferedImage img, int[][] spMap) {
 
 		SingleLinkedList<Pixel> ToReturn = new SingleLinkedList<Pixel>();
-
 		
 		//loop starts at top left goes to bottom right
 		//going along x for each row
