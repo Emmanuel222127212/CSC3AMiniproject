@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.graphstream.graph.Graph;
-
 import GraphADT.SuperPixel;
 import GraphADT.Vertex;
 import javafx.scene.Scene;
@@ -24,9 +22,14 @@ public class Game {
 	private GraphADT.Graph<SuperPixel> currentGraph;
 	private GraphicsContext gc;
 	
-	public static String menu = "press select maze \npress attempt to keep attempting the maze \npress results to see cognitive aiblity"
-			+ "\n press reset to try a new maze"
-			+ "\nUSE ARROW KEYS TO MOVE \nPRESS ENTER OR ESACAP \nFINSISH MAZE";
+	public static String menu = 
+		    "Press 'Select Maze' to choose a maze.\n" +
+		    "Press 'Attempt' to keep attempting the maze.\n" +
+		    "Press 'Results' to view cognitive ability results.\n" +
+		    "Press 'Reset' to try a new maze.\n\n" +
+		    "Use arrow keys to move.\n" +
+		    "Press Enter or Escape to finish the maze.";
+
 	private static String[] moveList = {"UP","DOWN","LEFT","RIGHT"};
 	
 	public Game() {};
@@ -88,7 +91,7 @@ public class Game {
 	
 	public String showProgress() {
 		 
-		return String.format("on Attempt : %d ", player.numberOfAttempts());	
+		return String.format("On Attempt : %d ", player.numberOfAttempts());	
 	}
 	
 	
@@ -199,7 +202,5 @@ public class Game {
 		moveInGame(move, t, event);
 	
 	}
-	
-	
 	
 }
