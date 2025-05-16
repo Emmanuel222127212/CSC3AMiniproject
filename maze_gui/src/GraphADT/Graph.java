@@ -73,6 +73,8 @@ public class Graph<T> {
 
 		}
 
+		
+		
 		// Create a copy of the original image to overlay edges
 		BufferedImage edgeOverlay = new BufferedImage(rgbImage.getWidth(), rgbImage.getHeight(),
 				BufferedImage.TYPE_INT_RGB);
@@ -106,7 +108,8 @@ public class Graph<T> {
 
 		// Save final image
 		try {
-			ImageIO.write(edgeOverlay, "png", new File("Output_maze3.png"));
+			System.out.println("makeing image for " + FileName);
+			ImageIO.write(edgeOverlay, "png", new File("Output_maze.png"));
 			System.out.println("Image made");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -116,7 +119,11 @@ public class Graph<T> {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	
+	public List<Vertex<SuperPixel>> getVertices(){
+		return this.SuperPixelList;
+	}
+	
 	public void findStartAndEnd() {
 
 		for (Vertex<SuperPixel> v : SuperPixelList) {

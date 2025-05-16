@@ -6,9 +6,34 @@ public class User {
 	private String name;
 	private AttemptRecord currentAttempt;
 	private ArrayList<AttemptRecord> attempts = new ArrayList<AttemptRecord>();
+	int currentx = 0;
+	int currenty =0;
 	
 	
-	
+	/**
+	 * @return the currentx
+	 */
+	public int getCurrentx() {
+		return currentx;
+	}
+	/**
+	 * @param currentx the currentx to set
+	 */
+	public void setCurrentx(int currentx) {
+		this.currentx = currentx;
+	}
+	/**
+	 * @return the currenty
+	 */
+	public int getCurrenty() {
+		return currenty;
+	}
+	/**
+	 * @param currenty the currenty to set
+	 */
+	public void setCurrenty(int currenty) {
+		this.currenty = currenty;
+	}
 	/**
 	 * @return the currentAttempt
 	 */

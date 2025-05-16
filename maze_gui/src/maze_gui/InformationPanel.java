@@ -12,12 +12,16 @@ import gamestuff.AttemptRecord;
 import gamestuff.Game;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -40,7 +44,8 @@ public class InformationPanel extends VBox{
 	private Button resetButton = new Button("reset");
 	private Button resultButton = new Button("results");
 	private VBox menuBox = new VBox();
-	
+	private Canvas canvas;
+	private GraphicsContext gc;
 	
 	public InformationPanel(Game game) {
 		this.game = game;
@@ -76,7 +81,7 @@ public class InformationPanel extends VBox{
 		//attempt button
 				attemptButton.setOnAction( e -> {
 					changeProgress();
-					game.startRound(attempts, s);
+					game.startRound(attempts,s);
 					
 					
 				});
@@ -93,7 +98,7 @@ public class InformationPanel extends VBox{
 	}
 	
 	
-	public void SelectImage(ImageView i) {
+	public void SelectImage(Pane s) {
 		//select image button
 				selectButton.setOnAction(e -> {
 					FileChooser pickFile = new FileChooser();
@@ -105,11 +110,17 @@ public class InformationPanel extends VBox{
 					File chosenFile = pickFile.showOpenDialog(stage);
 					
 					if(chosenFile != null && chosenFile.getAbsolutePath().endsWith(".png")) {
-						i.setImage(new Image(chosenFile.toURI().toString()));
-						System.out.println("image set");
-						new Thread(()->{
-							game.setGraph(chosenFile);
-						}).start();
+						Image image = new Image(chosenFile.toURI().toString());
+						
+						System.out.println("image set");	
+						canvas = new Canvas(image.getWidth(),image.getHeight());
+						s.getChildren().add(canvas);
+						gc = canvas.getGraphicsContext2D();
+						gc.drawImage(image, 0,0,canvas.getWidth(),canvas.getHeight());
+						
+							game.setGraph(chosenFile,image.getWidth(),image.getHeight(),gc);	
+							
+					
 						
 					}else {
 						
