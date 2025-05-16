@@ -271,6 +271,10 @@ public class Graph<T> {
 	public Vertex<SuperPixel> getEndVertex() {
 		return endVertex;
 	}
+	
+	public List<Vertex<SuperPixel>> getVertices(){
+		return this.SuperPixelList;
+	}
  
 	/**
 	 * Function to add superpixels to the adjacency list forming the graph structure
