@@ -3,6 +3,9 @@ package gamestuff;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
+import GraphADT.SuperPixel;
+import GraphADT.Vertex;
+
 public class AttemptRecord {
 	 private int AttemptNum;
 	 private int KeyCount = 0;
@@ -13,12 +16,22 @@ public class AttemptRecord {
 	 private static int SECOND = 2;
 	 private int[] performanceTime = new int[3];
 	 private ArrayList<String> Moves  = new ArrayList<String>();
+	 private GraphADT.ArrayList<Vertex<SuperPixel>> attemptpath;
 	 
 	 public AttemptRecord(int attempnum) {
 		 this.AttemptNum = attempnum;
 		 this.starTime = LocalTime.now();
+		 this.attemptpath = new GraphADT.ArrayList<Vertex<SuperPixel>>();
 	 }
 	 
+	 
+	 public void addToPath(Vertex<SuperPixel>  val) {
+		 this.attemptpath.add(val);
+	 }
+	 
+	 public GraphADT.ArrayList<Vertex<SuperPixel>> getAttemptPath(){
+		 return this.attemptpath;
+	 }
 	 public void addMove(String move) {
 		 this.Moves.add(move);
 	 }

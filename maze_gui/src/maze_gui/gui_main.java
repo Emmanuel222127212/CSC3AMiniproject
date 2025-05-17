@@ -2,19 +2,8 @@ package maze_gui;
 
 
 
-import java.awt.Component;
-
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
-
-import org.graphstream.graph.Graph;
-import org.graphstream.graph.implementations.SingleGraph;
-import org.graphstream.ui.view.Viewer;
-import org.graphstream.ui.view.View;
-
 import gamestuff.Game;
 import javafx.application.Application;
-import javafx.embed.swing.SwingNode;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;

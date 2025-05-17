@@ -4,14 +4,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import GraphADT.Edge;
 import GraphADT.SuperPixel;
 import GraphADT.Vertex;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+
+
 
 public class Game {
 	
@@ -21,6 +23,7 @@ public class Game {
 	
 	private GraphADT.Graph<SuperPixel> currentGraph;
 	private GraphicsContext gc;
+	private Vertex<SuperPixel> currentVertex;
 	
 	public static String menu = 
 		    "Press 'Select Maze' to choose a maze.\n" +
@@ -76,9 +79,10 @@ public class Game {
 				this.currentGraph = new GraphADT.Graph<SuperPixel>(i.getPath());
 				System.out.println("graph made");
 			
+				currentVertex = currentGraph.getStartVertex();
 				int startx = currentGraph.getStartVertex().GetElement().getAvgPixelXPos();
 				int starty = currentGraph.getStartVertex().GetElement().getyAvgPixelYPos();
-				
+				player.getCurrentAttempt().addToPath(currentVertex);
 				player.setCurrentx(startx);
 				player.setCurrenty(starty);
 				gc.fillRect(startx,starty,10,10);	
@@ -111,81 +115,86 @@ public class Game {
 	}
 	
 	
-	private boolean withiInBounds(int number, int higherBound, int lowerBound) {
-		return (number < higherBound) && (number > lowerBound);
-	}
-
-	
-	private boolean canMoveThere(int x, int y) {
+	public void moveToVertex(String move) {
+		boolean moved = false;
 		
+		System.out.println(String.format(" the current x : %d \n the current y : %d",player.getCurrentx(), player.getCurrenty()));
 			
-			 boolean xIsGood = withiInBounds(x, (int)gc.getCanvas().getWidth(), 0);
-					
-			 boolean yIsGood = withiInBounds(y, (int)gc.getCanvas().getHeight(), 0);
-			 if(xIsGood && yIsGood) {
-				//check type of sp
-				return true;
-					
-				 
+			
+			for(Edge<SuperPixel> edge: currentVertex.EdgeList()) {
 				
+				boolean foundNextVertex = false;
+				 Vertex<SuperPixel> nextVert ;
+				 
+				 if(currentVertex == currentGraph.getStartVertex()) {
+					 System.out.println("at start");
+				 }
+				 
+				 if (edge.getVertFrom() == currentVertex) {
+					 nextVert = edge.getVertTO();
+		            } else {
+		            	nextVert = edge.getVertFrom();
+		            }
+				 System.out.println(String.format(" the next x : %d \n the next y : %d",nextVert.GetElement().getAvgPixelXPos() ,nextVert.GetElement().getyAvgPixelYPos()));
+				switch (move) {
+				case "LEFT": {
+					if(nextVert.GetElement().getAvgPixelXPos() < player.getCurrentx()) {
+						foundNextVertex = true;
+						System.out.println("to left");
+					}
+					break;
+				}
+				case "RIGHT": {
+					if(nextVert.GetElement().getAvgPixelXPos() > player.getCurrentx()) {
+						foundNextVertex = true;
+						System.out.println("to right");
+					}
+					break;
+				}
+				case "UP": {
+					if(nextVert.GetElement().getyAvgPixelYPos() < player.getCurrenty()) {
+						foundNextVertex = true;
+						System.out.println("to up");
+					}
+					break;
+				}
+				case "DOWN": {
+					if(nextVert.GetElement().getyAvgPixelYPos() > player.getCurrenty()) {
+						foundNextVertex = true;
+						System.out.println("to down");
+					}
+					break;
+				}
+				default:
+					throw new IllegalArgumentException("Unexpected value: " + move);
+				}
+				
+				if(foundNextVertex && nextVert.GetElement().GetType() == 1) {
+					currentVertex = nextVert;
+					System.out.println("found nextvert");
+							moved= true;
+							player.setCurrentx(nextVert.GetElement().getAvgPixelXPos() );
+							player.setCurrenty(nextVert.GetElement().getyAvgPixelYPos());
+							gc.fillRect(player.getCurrentx(), player.getCurrenty(), 10, 10);
+							player.getCurrentAttempt().addToPath(nextVert);
+				}else {
+					System.out.println("not next");
+					System.out.println(" the type is " +  nextVert.GetElement().GetType());
+				}
+			}
+			
+			
+			if(moved) {
+				System.out.println("move");
+				return;
 			}
 		
-		return false;
-	}
-	
-	private void keepMovingFrom(int x, int y, String move) {
-		System.out.println(String.format("started moving at x: %d and at y: %d", player.getCurrentx(),player.getCurrenty()));
-		
-		int nextX = player.getCurrentx();
-		int nextY = player.getCurrenty();
-		System.out.println("moving " + move);
-		switch (move) {
-		case "LEFT": {
-			nextX--;
-			break;
-		}
-		case "RIGHT": {
-			nextX++;
-			break;
-		}
-		case "UP": {
-			nextY--;
-			break;
-		}
-		case "DOWN": {
-			nextY++;
-			break;
-		}
-		default:
-			throw new IllegalArgumentException("Unexpected value: " + move);
-		}
-		
-		
-		int differenceX = nextX-player.getCurrentx();
-		int differenceY = nextY-player.getCurrenty();
-		
-		//if the next path is not a wall
-		
-		
-		while(canMoveThere(x, y)) {
 			
-			gc.fillRect(x, y, 10, 10);
-			
-			if(differenceX > 0) {
-				x++;
-			}else if(differenceX < 0) {
-				x--;
-			}else if(differenceY > 0) {
-				y++;
-			}else if(differenceY < 0) {
-				y--;
-			}
-		}
+			System.out.println("none found");
 		
-		player.setCurrentx(x);
-		player.setCurrenty(y);
 		
-		System.out.println(String.format("stopped moving at x: %d and at y: %d", player.getCurrentx(),player.getCurrenty()));
+		
+		
 	}
 	
 	public void moveInGame(String move, TextArea t,javafx.scene.input.KeyEvent event) {
@@ -194,41 +203,9 @@ public class Game {
 			//t.appendText("\nKey count: " + keyCount);
 			player.getCurrentAttempt().addMove(move);
 		//	t.appendText("\nkey pressed :  " + event.getCode());
-			
-			int nextX = player.getCurrentx();
-			int nextY = player.getCurrenty();
-			
-			switch (move) {
-			case "LEFT": {
-				nextX -= 3;
-				break;
-			}
-			case "RIGHT": {
-				nextX += 3;
-				break;
-			}
-			case "UP": {
-				nextY-= 3;
-				break;
-			}
-			case "DOWN": {
-				nextY += 5;
-				break;
-			}
-			default:
-				throw new IllegalArgumentException("Unexpected value: " + move);
-			}
 			gc.setFill(Color.RED);
-			 if(canMoveThere(nextX, nextY)) {
-				 System.out.println("can move there");
-				 player.setCurrentx(nextX);
-				 player.setCurrenty(nextY);
-				 gc.fillRect(nextX, nextY, 10, 10);
-				 
-			 }else {
-				 System.out.println("Cant move there");
-			 }
-			
+			moveToVertex(move);
+		
 			
 			
 		}else if(move.equals("ESCAPE") || move.equals("ENTER")) {
