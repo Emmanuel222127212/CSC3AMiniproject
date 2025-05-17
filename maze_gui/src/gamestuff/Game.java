@@ -114,31 +114,78 @@ public class Game {
 	private boolean withiInBounds(int number, int higherBound, int lowerBound) {
 		return (number < higherBound) && (number > lowerBound);
 	}
+
 	
 	private boolean canMoveThere(int x, int y) {
-		for(Vertex<SuperPixel> sp : currentGraph.getVertices()) {
-			SuperPixel currentSuperPixel = sp.GetElement();
-			int halfway = currentSuperPixel.SuperPixelSize()/2;
-			 boolean xIsGood = withiInBounds(x, currentSuperPixel.getAvgPixelXPos()+halfway, currentSuperPixel.getAvgPixelXPos() - halfway);
+		
+			
+			 boolean xIsGood = withiInBounds(x, (int)gc.getCanvas().getWidth(), 0);
 					
-			 boolean yIsGood = withiInBounds(y, currentSuperPixel.getyAvgPixelYPos()+halfway, currentSuperPixel.getyAvgPixelYPos()-halfway);
+			 boolean yIsGood = withiInBounds(y, (int)gc.getCanvas().getHeight(), 0);
 			 if(xIsGood && yIsGood) {
 				//check type of sp
-				 if(currentSuperPixel.GetType()==2) 
-					 return true;
+				return true;
+					
 				 
-				 return false;
+				
 			}
-		}
+		
 		return false;
 	}
 	
-	private void keepMovingFrom(int x, int y) {
+	private void keepMovingFrom(int x, int y, String move) {
+		System.out.println(String.format("started moving at x: %d and at y: %d", player.getCurrentx(),player.getCurrenty()));
+		
+		int nextX = player.getCurrentx();
+		int nextY = player.getCurrenty();
+		System.out.println("moving " + move);
+		switch (move) {
+		case "LEFT": {
+			nextX--;
+			break;
+		}
+		case "RIGHT": {
+			nextX++;
+			break;
+		}
+		case "UP": {
+			nextY--;
+			break;
+		}
+		case "DOWN": {
+			nextY++;
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + move);
+		}
+		
+		
+		int differenceX = nextX-player.getCurrentx();
+		int differenceY = nextY-player.getCurrenty();
+		
+		//if the next path is not a wall
+		
+		
 		while(canMoveThere(x, y)) {
 			
-			x++;
-			y++;
+			gc.fillRect(x, y, 10, 10);
+			
+			if(differenceX > 0) {
+				x++;
+			}else if(differenceX < 0) {
+				x--;
+			}else if(differenceY > 0) {
+				y++;
+			}else if(differenceY < 0) {
+				y--;
+			}
 		}
+		
+		player.setCurrentx(x);
+		player.setCurrenty(y);
+		
+		System.out.println(String.format("stopped moving at x: %d and at y: %d", player.getCurrentx(),player.getCurrenty()));
 	}
 	
 	public void moveInGame(String move, TextArea t,javafx.scene.input.KeyEvent event) {
@@ -150,33 +197,38 @@ public class Game {
 			
 			int nextX = player.getCurrentx();
 			int nextY = player.getCurrenty();
-			System.out.println("moving " + move);
+			
 			switch (move) {
-	case "LEFT": {
-				nextX--;
+			case "LEFT": {
+				nextX -= 3;
 				break;
 			}
-	case "RIGHT": {
-				nextX++;
-		break;
-	}
-	case "UP": {
-				nextY++;
-		break;
-	}
-	case "DOWN": {
-				nextY--;
-		break;
-	}
+			case "RIGHT": {
+				nextX += 3;
+				break;
+			}
+			case "UP": {
+				nextY-= 3;
+				break;
+			}
+			case "DOWN": {
+				nextY += 5;
+				break;
+			}
 			default:
 				throw new IllegalArgumentException("Unexpected value: " + move);
 			}
+			gc.setFill(Color.RED);
+			 if(canMoveThere(nextX, nextY)) {
+				 System.out.println("can move there");
+				 player.setCurrentx(nextX);
+				 player.setCurrenty(nextY);
+				 gc.fillRect(nextX, nextY, 10, 10);
+				 
+			 }else {
+				 System.out.println("Cant move there");
+			 }
 			
-			
-			int differenceX = nextX-player.getCurrentx();
-			int differenceY = nextY-player.getCurrenty();
-			
-			//if the next path is not a wall
 			
 			
 		}else if(move.equals("ESCAPE") || move.equals("ENTER")) {
