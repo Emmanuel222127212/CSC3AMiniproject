@@ -122,6 +122,11 @@ public class Graph<T> {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+=======
+		ConstructConnectedGraph(EdgesFound, ReadGrey); // Use the edges and grey scale to construct superpixels and
+														// connect
+		// each vertex and edge
+>>>>>>> Stashed changes
 
 		findStartAndEnd();
 	}
@@ -298,8 +303,10 @@ public class Graph<T> {
 	private void addSuperPixel(SuperPixel value) {
 
 		Vertex<SuperPixel> V = new Vertex<SuperPixel>(value);
+		VertexMap.put(value.getId(), V); // add this to the vertex map
 
 		this.SuperPixelList.add(V);
+
 		NumRegions++;
 
 	}
@@ -330,7 +337,7 @@ public class Graph<T> {
 	 * Add an edge between two vertices;thereby connecting them together
 	 * 
 	 * @param a Intial Vertex Vertex to add edge between
-	 * @param b Next Vertex  Vertex were adding edge to
+	 * @param b Next Vertex Vertex were adding edge to
 	 */
 	public void addEdge(Vertex<SuperPixel> a, Vertex<SuperPixel> b) {
 		Edge<SuperPixel> Edgebtween = new Edge<SuperPixel>(a, b);
@@ -344,6 +351,7 @@ public class Graph<T> {
 
 	/**
 	 * Check if theres already an edge between 2 SuperPixels based on their ID
+	 * 
 	 * @param superPixelId1 id of the second superpixel to check
 	 * @param superPixelId2 Id of the first superpixel to check
 	 * @return True/False based on if an edge exists
@@ -366,19 +374,14 @@ public class Graph<T> {
 
 	/**
 	 * Locate a SuperPixel via its ID and return it within a vertex
+	 * 
 	 * @param SPId ID of the superPixel to retrieve
 	 * @return A Vertext containing the found superPixel
 	 */
 	private Vertex<SuperPixel> SearchSuperPixelList(int SPId) {
 
-		for (Vertex<SuperPixel> V : SuperPixelList) {
-			if (SPId == V.GetElement().getId()) {
-				return V;
-			} else {
-				continue;
-			}
-		}
-		return null;
+		Vertex<SuperPixel> toReturn = VertexMap.get(SPId);
+		return toReturn;
 	}
 
 	/**
