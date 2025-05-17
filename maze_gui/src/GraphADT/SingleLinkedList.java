@@ -59,6 +59,38 @@ public class SingleLinkedList<T>  implements Iterable<T>{
 		return DataRemoved;
 
 	}
+	public T Remove(Node<T> toRemove) {
+		if(isEmpty() || toRemove==null) {
+			return null;
+		}
+		
+		if(toRemove==Head) {
+			RemoveFirst();
+		}
+		
+		Node<T> temp= this.Head;
+		while (temp!=null && temp.Next()!=toRemove) {
+			temp=temp.Next();
+		
+		}
+		if(temp==null || temp.Next()!=toRemove) {
+			return null;
+		}
+		
+		
+		Node<T> removalNode = temp.Next();
+		temp.SetNext(removalNode.Next());
+		
+		if(removalNode==Tail) {
+			Tail=temp;
+		}
+		
+		removalNode.SetNext(null);
+		size--;
+		
+		
+		return removalNode.GetData();
+	}
 
 	public boolean isEmpty() {
 		if (size == 0) {
