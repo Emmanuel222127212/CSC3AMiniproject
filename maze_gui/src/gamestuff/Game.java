@@ -4,13 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.graphstream.graph.Graph;
 
 import GraphADT.SuperPixel;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
 
 public class Game {
 	

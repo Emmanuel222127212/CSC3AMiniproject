@@ -6,12 +6,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import javax.imageio.ImageIO;
 
 public class Graph<T> {
 
-	private List<Vertex<SuperPixel>> SuperPixelList;
+	private GraphADT.ArrayList<Vertex<SuperPixel>> SuperPixelList;
 	private int NumRegions;
 	private int Imgheight;
 	private int Imgwidth;
@@ -36,7 +35,7 @@ public class Graph<T> {
 
 		Imgheight = ReadGrey.getHeight(); // get height
 		Imgwidth = ReadGrey.getWidth(); // get width
-		SuperPixelList = new ArrayList<Vertex<SuperPixel>>(); // initialise the Adjacency List(list of
+		SuperPixelList = new GraphADT.ArrayList<Vertex<SuperPixel>>(); // initialise the Adjacency List(list of
 																// vertices/superpixels)
 
 		boolean[][] EdgesFound = EdgeDetect(ReadGrey); // locate all the edges in the image(all walls and out of bounds
@@ -142,16 +141,16 @@ public class Graph<T> {
 		}
 	}
 
-	public List<Vertex<SuperPixel>> findPath() {
+	public GraphADT.ArrayList<Vertex<SuperPixel>> findPath() {
 
 		if (startVertex == null || endVertex == null) {
-			return new ArrayList<>();
+			return new GraphADT.ArrayList<Vertex<SuperPixel>>();
 		}
 
-		LinkedQueue<List<Vertex<SuperPixel>>> queue = new LinkedQueue<>();
-		List<Vertex<SuperPixel>> visited = new ArrayList<>();
+		LinkedQueue<GraphADT.ArrayList<Vertex<SuperPixel>>> queue = new LinkedQueue<>();
+		GraphADT.ArrayList<Vertex<SuperPixel>> visited = new GraphADT.ArrayList<Vertex<SuperPixel>>();
 
-		List<Vertex<SuperPixel>> startPath = new ArrayList<>();
+		GraphADT.ArrayList<Vertex<SuperPixel>> startPath = new GraphADT.ArrayList<>();
 		startPath.add(startVertex);
 		queue.Enqueue(startPath);
 		visited.add(startVertex);
@@ -159,7 +158,7 @@ public class Graph<T> {
 		while (!queue.isEmpty()) {
 
 			// take the next path
-			List<Vertex<SuperPixel>> path = queue.Dequeue();
+			GraphADT.ArrayList<Vertex<SuperPixel>> path = queue.Dequeue();
 			// look at its last vertex
 			Vertex<SuperPixel> v = path.get(path.size() - 1);
 
@@ -179,7 +178,7 @@ public class Graph<T> {
 
 				if (!visited.contains(w)) {
 					visited.add(w);
-					List<Vertex<SuperPixel>> newPath = new ArrayList<>(path);
+					GraphADT.ArrayList<Vertex<SuperPixel>> newPath = new GraphADT.ArrayList<Vertex<SuperPixel>>(path);
 					newPath.add(w);
 					queue.Enqueue(newPath);
 				}
@@ -187,7 +186,7 @@ public class Graph<T> {
 		}
 
 		// no path found
-		return new ArrayList<>();
+		return new GraphADT.ArrayList<Vertex<SuperPixel>>();
 	}
 
 	public Vertex<SuperPixel> getStartVertex() {
