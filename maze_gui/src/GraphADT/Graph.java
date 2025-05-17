@@ -290,7 +290,7 @@ public class Graph<T> {
 		return endVertex;
 	}
 	
-	public List<Vertex<SuperPixel>> getVertices(){
+	public GraphADT.ArrayList<Vertex<SuperPixel>> getVertices(){
 		return this.SuperPixelList;
 	}
  
@@ -699,17 +699,14 @@ public class Graph<T> {
 			BufferedImage img, int[][] spMap) {
 
 		SingleLinkedList<Pixel> ToReturn = new SingleLinkedList<Pixel>();
-<<<<<<< Updated upstream
+
 		
-		//loop starts at top left goes to bottom right
-		//going along x for each row
-		for (int i = 1; i >= -1; i--) { 
-=======
+	
 
 		// loop starts at top left goes to bottom right
 		// going along x for each row
 		for (int i = 1; i >= -1; i--) {
->>>>>>> Stashed changes
+
 			for (int j = -1; j <= 1; j++) {
 				if (i == 0 && j == 0) {
 					continue;
@@ -733,7 +730,7 @@ public class Graph<T> {
 				}
 			}
 		}
-
+		
 		return ToReturn;
 	}
 
