@@ -10,7 +10,7 @@ import javax.imageio.ImageIO;
 
 public class Graph<T> {
 
-	private List<Vertex<SuperPixel>> SuperPixelList;
+	private GraphADT.ArrayList<Vertex<SuperPixel>> SuperPixelList;
 	private int NumRegions;
 	private int Imgheight;
 	private int Imgwidth;
@@ -33,7 +33,7 @@ public class Graph<T> {
 
 		Imgheight = ReadGrey.getHeight(); // get height
 		Imgwidth = ReadGrey.getWidth(); // get width
-		SuperPixelList = new ArrayList<Vertex<SuperPixel>>(); // initialise the Adjacency List(list of
+		SuperPixelList = new GraphADT.ArrayList<Vertex<SuperPixel>>(); // initialise the Adjacency List(list of
 																// vertices/superpixels)
 
 		boolean[][] EdgesFound = EdgeDetect(ReadGrey); // locate all the edges in the image(all walls and out of bounds
@@ -146,6 +146,7 @@ public class Graph<T> {
 	}
 
 
+
 	/**
 	 * Makes a path shorter by keeping only some of the points.
 	 * This method goes through the given path and keeps every 4th SuperPixel 
@@ -155,11 +156,11 @@ public class Graph<T> {
 	 * @param path The original list of SuperPixel vertices (the full path)
 	 * @return A shorter version of the path
 	 */
-	public List<Vertex<SuperPixel>> simplifyPath(List<Vertex<SuperPixel>> path) {
+	public GraphADT.ArrayList<Vertex<SuperPixel>> simplifyPath(GraphADT.ArrayList<Vertex<SuperPixel>> path) {
 	    // If the path has fewer than 2 points, return it as is - would'nt make sense to skip pixels if our path is that short
 	    if (path.size() < 2) return path;
 
-	    List<Vertex<SuperPixel>> simple = new ArrayList<>();
+		GraphADT.ArrayList<Vertex<SuperPixel>> simple = new GraphADT.ArrayList<Vertex<SuperPixel>>();
 
 	 // Only keep every 4th point from the path - (i was trying to minimise/reduce the  lines in the path)
 	    int STEP = 4;  
@@ -190,22 +191,29 @@ public class Graph<T> {
 	 * @return A list of SuperPixel vertices that form the path from start to end.
 	 *         If no path is found or start/end is missing, returns an empty list.
 	 */
-	public List<Vertex<SuperPixel>> findPath() {
+	public GraphADT.ArrayList<Vertex<SuperPixel>> findPath() {
 
 	    // If start or end is not set, return an empty path
 	    if (startVertex == null || endVertex == null) 
 	    {
-	        return new ArrayList<>();
+	        return new GraphADT.ArrayList<Vertex<SuperPixel>>();
 	    }
 
 	    // A queue to store paths to explore
-	    LinkedQueue<List<Vertex<SuperPixel>>> queue = new LinkedQueue<>();
+		LinkedQueue<GraphADT.ArrayList<Vertex<SuperPixel>>> queue = new LinkedQueue<>();
 
 	    // A list to keep track of visited vertices
-	    List<Vertex<SuperPixel>> visited = new ArrayList<>();
+	    GraphADT.ArrayList<Vertex<SuperPixel>> visited = new GraphADT.ArrayList<Vertex<SuperPixel>>();
+
+
+		
+		startPath.add(startVertex);
+		queue.Enqueue(startPath);
+		visited.add(startVertex);
+
 
 	    // Start a new path from the start vertex
-	    List<Vertex<SuperPixel>> startPath = new ArrayList<>();
+		GraphADT.ArrayList<Vertex<SuperPixel>> startPath = new GraphADT.ArrayList<>();
 	    startPath.add(startVertex);
 	    queue.Enqueue(startPath);        // Add the starting path to the queue
 	    visited.add(startVertex);        // Mark the start vertex as visited
@@ -213,8 +221,9 @@ public class Graph<T> {
 	    // Keep going while there are paths to check
 	    while (!queue.isEmpty()) {
 
+
 	        // Take the next path from the queue
-	        List<Vertex<SuperPixel>> path = queue.Dequeue();
+			GraphADT.ArrayList<Vertex<SuperPixel>> path = queue.Dequeue();
 
 	        // Get the last vertex in the current path
 	        Vertex<SuperPixel> v = path.get(path.size() - 1);
@@ -226,6 +235,7 @@ public class Graph<T> {
 
 	        // Check all edges connected to this vertex
 	        for (Edge<SuperPixel> e : v.EdgeList()) {
+
 
 	            Vertex<SuperPixel> w;
 
@@ -241,7 +251,7 @@ public class Graph<T> {
 	                visited.add(w); // Mark it as visited
 
 	                // Create a new path that includes this vertex
-	                List<Vertex<SuperPixel>> newPath = new ArrayList<>(path);
+					GraphADT.ArrayList<Vertex<SuperPixel>> newPath = new GraphADT.ArrayList<Vertex<SuperPixel>>(path);
 	                newPath.add(w);
 
 	                // Add the new path to the queue to be explored later
@@ -251,7 +261,7 @@ public class Graph<T> {
 	    }
 
 	    // If no path is found, return an empty list
-	    return new ArrayList<>();
+		return new GraphADT.ArrayList<Vertex<SuperPixel>>();
 	}
 
 

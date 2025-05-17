@@ -4,14 +4,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+
 import GraphADT.SuperPixel;
 import GraphADT.Vertex;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
+
+
 
 public class Game {
 	
