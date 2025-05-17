@@ -16,6 +16,9 @@ import javafx.scene.image.ImageView;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 
 public class InformationPanel extends VBox{
