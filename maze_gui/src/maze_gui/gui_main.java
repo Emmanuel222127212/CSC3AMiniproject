@@ -18,9 +18,7 @@ public class gui_main extends Application{
 	public void start(Stage arg0) throws Exception {
 		// TODO Auto-generated method stub
 		HBox rootBox = new HBox();
-		
-	
-		
+
 		/*display for maze,
 		submit path button
 		reset maze button
@@ -43,9 +41,10 @@ public class gui_main extends Application{
 		rootBox.getChildren().add(vBox);
 		VBox secondPanel = new VBox();
 		Scene mainScene = new Scene(rootBox);
-		ImageView viewimage = new ImageView();
-		Panel1.SelectImage(viewimage);
-		secondPanel.getChildren().addAll(viewimage);
+		
+		
+		Panel1.SelectImage(secondPanel);
+		
 		
 		rootBox.setPrefSize(950,500);
 		rootBox.getChildren().add(secondPanel);
