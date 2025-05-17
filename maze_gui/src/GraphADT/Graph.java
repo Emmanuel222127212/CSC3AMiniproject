@@ -49,7 +49,7 @@ public class Graph<T> {
 		boolean[][] EdgesFound = EdgeDetect(ReadGrey); // locate all the edges in the image(all walls and out of bounds
 														// areas)
 
-<<<<<<< Updated upstream
+
 		ConstructConnectedGraph(EdgesFound, ReadGrey); // Use the edges and grey scale to construct superpixels and connect
 												// each vertex and edge
 
@@ -122,11 +122,11 @@ public class Graph<T> {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-=======
+
 		ConstructConnectedGraph(EdgesFound, ReadGrey); // Use the edges and grey scale to construct superpixels and
 														// connect
 		// each vertex and edge
->>>>>>> Stashed changes
+
 
 		findStartAndEnd();
 	}
