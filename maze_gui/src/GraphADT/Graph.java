@@ -204,16 +204,8 @@ public class Graph<T> {
 
 	    // A list to keep track of visited vertices
 	    GraphADT.ArrayList<Vertex<SuperPixel>> visited = new GraphADT.ArrayList<Vertex<SuperPixel>>();
-
-
-		
-		startPath.add(startVertex);
-		queue.Enqueue(startPath);
-		visited.add(startVertex);
-
-
 	    // Start a new path from the start vertex
-		GraphADT.ArrayList<Vertex<SuperPixel>> startPath = new GraphADT.ArrayList<>();
+	    GraphADT.ArrayList<Vertex<SuperPixel>> startPath = new GraphADT.ArrayList<>();
 	    startPath.add(startVertex);
 	    queue.Enqueue(startPath);        // Add the starting path to the queue
 	    visited.add(startVertex);        // Mark the start vertex as visited
