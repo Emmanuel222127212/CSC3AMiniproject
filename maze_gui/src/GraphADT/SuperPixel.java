@@ -1,9 +1,35 @@
 package GraphADT;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class SuperPixel {
 
+	//protected comparator
+	protected class SPComparator implements Comparator<SuperPixel>{
+
+		private boolean isClose(SuperPixel o1, SuperPixel o2) {
+			return (Math.abs(o1.getAvgPixelXPos() - o2.getAvgPixelXPos()) <= 10 && o1.getyAvgPixelYPos() - o2.getyAvgPixelYPos() <= 10);
+		}
+		
+		@Override
+		public int compare(SuperPixel o1, SuperPixel o2) {
+			// TODO Auto-generated method stub
+			if(isClose(o1, o2))
+			return 0;
+			
+			if(o1.getAvgPixelXPos() >= o2.getAvgPixelXPos() || o1.getAvgPixelXPos() >= o2.getAvgPixelXPos())
+				return 1;
+			
+			return -1;
+		}
+		
+	}
+	
+	
+	private SPComparator comparator = new SPComparator();
+	
+	
 	private int AvgPixelXPos;
 	private int AvgPixelYPos;
 	private int SuperPixelID;
@@ -93,6 +119,12 @@ public class SuperPixel {
 
 	}
 	
+	
+	//Comparing
+	
+	public int compare(SuperPixel sp) {
+		return comparator.compare(this, sp);
+	}
 
 
 }
