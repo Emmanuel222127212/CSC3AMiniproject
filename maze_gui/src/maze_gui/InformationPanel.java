@@ -120,7 +120,7 @@ public class InformationPanel extends VBox{
 					
 					File chosenFile = pickFile.showOpenDialog(stage);
 					
-					if(chosenFile != null && chosenFile.getAbsolutePath().endsWith(".png")) {
+					if(chosenFile != null && (chosenFile.getAbsolutePath().endsWith(".png") || chosenFile.getAbsolutePath().endsWith(".jpg"))) {
 						Image image = new Image(chosenFile.toURI().toString());
 						
 						System.out.println("image set");	

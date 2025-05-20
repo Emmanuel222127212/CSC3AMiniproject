@@ -1,5 +1,6 @@
 package GraphADT;
 
+import image_preprocessing.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -30,7 +31,8 @@ public class Graph<T> {
 	 */
 	public Graph(String FileName) {
 
-		BufferedImage ReadGrey = GreyScaleImage(FileName); // convert image to greyscale
+		ImagePreProcessor test=new ImagePreProcessor(FileName); 
+		BufferedImage ReadGrey =test.getProcessedImage();// convert image to greyscale
 
 		Imgheight = ReadGrey.getHeight(); // get height
 		Imgwidth = ReadGrey.getWidth(); // get width
@@ -390,35 +392,7 @@ public class Graph<T> {
 	 * @param Filename Filename with path of the image to greyscale
 	 * @return GreyScaled image
 	 */
-	private BufferedImage GreyScaleImage(String Filename) {
-
-		try {
-			File file = new File(Filename);
-			System.out.println("Trying to read: " + file.getAbsolutePath());
-			System.out.println("Exists? " + file.exists());
-			BufferedImage ColourImage = ImageIO.read(file);
-
-			BufferedImage GreyScale = new BufferedImage(ColourImage.getWidth(), ColourImage.getHeight(),
-					BufferedImage.TYPE_BYTE_GRAY);
-
-			Graphics DrawGrey = GreyScale.getGraphics();
-
-			DrawGrey.drawImage(ColourImage, 0, 0, null);
-
-			DrawGrey.dispose();
-
-			File output = new File("Converted/GreyImage.png");
-			output.getParentFile().mkdirs();
-			ImageIO.write(GreyScale, "png", output);
-
-			return GreyScale;
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
+	
 
 	/**
 	 * Take an image in and locate the borders/edges within it (where a large change
