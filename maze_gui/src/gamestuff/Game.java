@@ -20,9 +20,13 @@ public class Game {
 	
 	int keyCount = 0;
 	private User player;
+
 	
 	//graph stuff
 	private Image currentImage;
+
+	private Image characterImage = new Image("/utilityImg/ujLogo.png");
+
 	private GraphADT.Graph<SuperPixel> currentGraph;
 	private GraphicsContext gc;
 	private Vertex<SuperPixel> currentVertex;
@@ -55,6 +59,22 @@ public class Game {
 		return player.getAttempts();
 	}
 	
+	
+	
+	/**
+	 * @return the currentImage
+	 */
+	public Image getCurrentImage() {
+		return currentImage;
+	}
+
+	/**
+	 * @param currentImage the currentImage to set
+	 */
+	public void setCurrentImage(Image currentImage) {
+		this.currentImage = currentImage;
+	}
+
 	public int numberOfAttempts() {
 		return player.numberOfAttempts();
 	}
@@ -220,7 +240,7 @@ public class Game {
 	private void drawMovement(int x , int y) {
 		gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
 		gc.drawImage(currentImage, 0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
-		gc.fillRect(x, y, 10, 10);
+		gc.drawImage(characterImage,x, y, 15, 15);
 	}
 	
 	public void moveInGame(String move, TextArea t,javafx.scene.input.KeyEvent event) {
@@ -245,7 +265,7 @@ public class Game {
 			t.clear();
 			t.appendText(DisplayAttempts(0));
 			System.out.println(DisplayAttempts(0));
-			t.requestFocus();
+			
 			//attempts.appendText(pRecord);
 			
 
