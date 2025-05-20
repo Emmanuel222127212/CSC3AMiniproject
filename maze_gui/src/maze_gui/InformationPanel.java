@@ -30,6 +30,7 @@ public class InformationPanel extends VBox{
 
 	
 	private Label name = new Label();
+	private File currentFile;
 	private Label menu = new Label(this.game.menu);
 	private Label attemptProgress = new Label();
 	private TextArea attempts = new TextArea();
@@ -135,10 +136,10 @@ public class InformationPanel extends VBox{
 					
 					Stage stage = new Stage();
 					
-					File chosenFile = pickFile.showOpenDialog(stage);
+					 currentFile = pickFile.showOpenDialog(stage);
 					
-					if(chosenFile != null && chosenFile.getAbsolutePath().endsWith(".png")) {
-						Image image = new Image(chosenFile.toURI().toString());
+					if(currentFile != null && currentFile.getAbsolutePath().endsWith(".png")) {
+						Image image = new Image(currentFile.toURI().toString());
 						
 						System.out.println("image set");	
 						canvas = new Canvas(image.getWidth(),image.getHeight());
@@ -146,7 +147,7 @@ public class InformationPanel extends VBox{
 						gc = canvas.getGraphicsContext2D();
 						gc.drawImage(image, 0,0,canvas.getWidth(),canvas.getHeight());
 						
-							game.setGraph(chosenFile,image.getWidth(),image.getHeight(),gc,image);	
+							game.setGraph(currentFile,image.getWidth(),image.getHeight(),gc,image);	
 							
 							setButtonVisibility(false, true);
 						
@@ -158,16 +159,25 @@ public class InformationPanel extends VBox{
 	}
 	private void setButtons() {
 		//reset button
-		resetButton.setOnAction(e -> {
+		setResults();
+		
+		
+	}
+	
+	
+	public void setResults() {
+resetButton.setOnAction(e -> {
 			
 		});
 		
 		//result button 
 		resultButton.setOnAction(e -> {
+			//Image imageView = new Image(new File("./Data/946.png").toURI().toString());
+			ResultsApplication resultsApplication = new ResultsApplication(currentFile);
+			
+				resultsApplication.startWin();
 			
 		});
-		
-		
 	}
 
 	private void setTextArea() {
