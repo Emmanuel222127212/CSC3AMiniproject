@@ -20,9 +20,11 @@ public class Game {
 	
 	int keyCount = 0;
 	private User player;
+
 	
 	//graph stuff
 	private Image currentImage;
+
 	private GraphADT.Graph<SuperPixel> currentGraph;
 	private GraphicsContext gc;
 	private Vertex<SuperPixel> currentVertex;
