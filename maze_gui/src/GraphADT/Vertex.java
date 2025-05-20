@@ -2,11 +2,8 @@ package GraphADT;
 import java.util.ArrayList;
 import java.util.List;
 
-public class  Vertex <T> implements Postion<T> {
-
-	
-	
-	
+public class  Vertex <T> implements Postion<T> 
+{
 	
 	private T element;
 	private List<Edge<T>> OutgoingEdges;
