@@ -1,8 +1,14 @@
+.label{
+	
+}
 
 
 .root{
+	-fx-padding:10px;
 	-fx-background-color:peachpuff;
 	-fx-alignment : center;
+	-fx-spacing: 15px;
+	
 }
 
 .button {
