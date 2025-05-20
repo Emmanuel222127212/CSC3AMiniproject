@@ -23,6 +23,7 @@ public class Game {
 	
 	//graph stuff
 	private Image currentImage;
+	private Image characterImage = new Image("/utilityImg/ujLogo.png");
 	private GraphADT.Graph<SuperPixel> currentGraph;
 	private GraphicsContext gc;
 	private Vertex<SuperPixel> currentVertex;
@@ -220,7 +221,7 @@ public class Game {
 	private void drawMovement(int x , int y) {
 		gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
 		gc.drawImage(currentImage, 0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
-		gc.fillRect(x, y, 10, 10);
+		gc.drawImage(characterImage,x, y, 15, 15);
 	}
 	
 	public void moveInGame(String move, TextArea t,javafx.scene.input.KeyEvent event) {

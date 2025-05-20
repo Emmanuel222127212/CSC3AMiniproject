@@ -17,6 +17,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -47,9 +48,10 @@ public class InformationPanel extends VBox{
 		setSpacing(10);
 		setButtons();
 		setPane();
-		setStyleAllign(this,"center");
-		setStyleAllign(menuBox,"center");
+		setStyleAllign(this);
+		setStyleAllign(menuBox);
 		setButtonVisibility(true, false);
+		setAllButtonStyles();
 	}
 	
 	
@@ -63,8 +65,23 @@ public class InformationPanel extends VBox{
 		resultButton.setVisible(visible);
 	}
 	
-	private void setStyleAllign(Pane pane,String alignment) {
-		pane.setStyle(String.format("-fx-alignment : %s", alignment));
+	//Pane Handling stuff
+	
+	private void setAllButtonStyles() {
+		setButtonStyle(selectButton);
+		setButtonStyle(attemptButton);
+		setButtonStyle(resetButton);
+		setButtonStyle(resultButton);
+	}
+	
+	private void setButtonStyle( Button btn) {
+		
+		btn.getStyleClass().add(".button");
+		btn.setPrefSize(500, 10);
+	}
+	
+	private void setStyleAllign(Pane pane) {
+		pane.getStyleClass().add(".vbox");
 	}
 	
 	public void change() {
@@ -154,7 +171,7 @@ public class InformationPanel extends VBox{
 	}
 
 	private void setTextArea() {
-		this.attempts.setDisable(true);
+		this.attempts.setEditable(false);
 		int width = 1000;
 		this.attempts.setMaxSize(width, width * 100 );
 		
