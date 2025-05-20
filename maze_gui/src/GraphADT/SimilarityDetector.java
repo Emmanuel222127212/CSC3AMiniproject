@@ -16,7 +16,9 @@ public class SimilarityDetector
         this.maxDistance = Math.sqrt(Math.pow(image.getWidth() - 1, 2) + Math.pow(image.getHeight() - 1, 2)) / 6;
     }
 
-    public double computeSimilarity(int id1, int id2) 
+    
+
+	public double computeSimilarity(int id1, int id2) 
     {
         if (id1 < 0 || id1 >= superpixels.size() || id2 < 0 || id2 >= superpixels.size()) {
             return 0.0; // Invalid ID

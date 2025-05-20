@@ -2,6 +2,7 @@ package maze_gui;
 
 
 
+import GraphADT.MazeProcessor;
 import gamestuff.Game;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -40,6 +41,29 @@ public class gui_main extends Application{
 		rootBox.getChildren().add(Panel1);
 		rootBox.getChildren().add(vBox);
 		VBox secondPanel = new VBox();
+		
+		 // Integration of MazeProcessor
+        ImageView imageView = new ImageView();
+        imageView.setFitWidth(400);
+        imageView.setFitHeight(400);
+        MazeProcessor mazeProcessor = new MazeProcessor(imageView);
+        Button similarityButton = new Button("Show Similarity");
+        String[] imagePath = {null}; // Store path
+        // Wrap InformationPanel.SelectImage
+        InformationPanelWrapper wrapper = new InformationPanelWrapper(Panel1, imageView);
+        wrapper.SelectImage(secondPanel, path -> imagePath[0] = path);
+        similarityButton.setOnAction(e -> {
+            if (imagePath[0] != null) {
+                mazeProcessor.processMazeImage(imagePath[0]);
+            } else {
+                System.out.println("No image selected.");
+            }
+        });
+        secondPanel.getChildren().addAll(similarityButton);
+		
+		
+		
+		
 		Scene mainScene = new Scene(rootBox);
 		
 		
@@ -57,6 +81,7 @@ public class gui_main extends Application{
 		TextArea name =new TextArea();
 		name.setMaxHeight(10);
 		Scene startScene = new Scene(start);
+		//Start button
 		Button swtiButton = new Button("Start Test");
 		
 		swtiButton.setOnAction(e -> {
