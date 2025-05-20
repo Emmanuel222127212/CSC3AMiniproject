@@ -59,6 +59,22 @@ public class Game {
 		return player.getAttempts();
 	}
 	
+	
+	
+	/**
+	 * @return the currentImage
+	 */
+	public Image getCurrentImage() {
+		return currentImage;
+	}
+
+	/**
+	 * @param currentImage the currentImage to set
+	 */
+	public void setCurrentImage(Image currentImage) {
+		this.currentImage = currentImage;
+	}
+
 	public int numberOfAttempts() {
 		return player.numberOfAttempts();
 	}
@@ -249,7 +265,7 @@ public class Game {
 			t.clear();
 			t.appendText(DisplayAttempts(0));
 			System.out.println(DisplayAttempts(0));
-			t.requestFocus();
+			
 			//attempts.appendText(pRecord);
 			
 

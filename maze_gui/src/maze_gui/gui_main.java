@@ -51,24 +51,8 @@ public class gui_main extends Application{
 		rootBox.getChildren().add(vBox);
 		VBox secondPanel = new VBox();
 		
-		 // Integration of MazeProcessor
-        ImageView imageView = new ImageView();
-        imageView.setFitWidth(400);
-        imageView.setFitHeight(400);
-        MazeProcessor mazeProcessor = new MazeProcessor(imageView);
-        Button similarityButton = new Button("Show Similarity");
-        String[] imagePath = {null}; // Store path
-        // Wrap InformationPanel.SelectImage
-        InformationPanelWrapper wrapper = new InformationPanelWrapper(Panel1, imageView);
-        wrapper.SelectImage(secondPanel, path -> imagePath[0] = path);
-        similarityButton.setOnAction(e -> {
-            if (imagePath[0] != null) {
-                mazeProcessor.processMazeImage(imagePath[0]);
-            } else {
-                System.out.println("No image selected.");
-            }
-        });
-        secondPanel.getChildren().addAll(similarityButton);
+		
+        //secondPanel.getChildren().addAll(similarityButton);
 		
 		
 		

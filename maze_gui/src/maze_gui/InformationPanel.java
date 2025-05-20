@@ -158,16 +158,25 @@ public class InformationPanel extends VBox{
 	}
 	private void setButtons() {
 		//reset button
-		resetButton.setOnAction(e -> {
+		setResults();
+		
+		
+	}
+	
+	
+	public void setResults() {
+resetButton.setOnAction(e -> {
 			
 		});
 		
 		//result button 
 		resultButton.setOnAction(e -> {
+			//Image imageView = new Image(new File("./Data/946.png").toURI().toString());
+			ResultsApplication resultsApplication = new ResultsApplication(game.getCurrentImage());
+			
+				resultsApplication.startWin();
 			
 		});
-		
-		
 	}
 
 	private void setTextArea() {
