@@ -2,6 +2,8 @@ package maze_gui;
 
 
 
+import java.io.File;
+
 import GraphADT.MazeProcessor;
 import GraphADT.SuperPixel;
 import GraphADT.Vertex;
@@ -19,6 +21,7 @@ import javafx.stage.Stage;
 public class ResultsApplication{
 	private ImageView currentImage;
 	private MazeProcessor mazeProcessor;
+	private File currentFile;
 	Button similarityButton = new Button("Show Similarity");
 	
 	public ResultsApplication(Image I) {
@@ -31,8 +34,10 @@ public class ResultsApplication{
 		mazeProcessor =  new MazeProcessor(currentImage);
 	}
 	
-	public ResultsApplication() {
-		
+	public ResultsApplication(File i) {
+		currentFile = i;
+		currentImage = new ImageView(new Image(currentFile.toURI().toString()));
+		mazeProcessor =  new MazeProcessor(currentImage);
 	}
 	
 
@@ -46,8 +51,9 @@ public class ResultsApplication{
 	        // Wrap InformationPanel.SelectImage
 	      
 	        similarityButton.setOnAction(e -> {
-	            if (currentImage != null) {
-	                mazeProcessor.processMazeImage(currentImage.getImage().getUrl());
+	            if (currentFile != null) {
+	            	System.out.println(currentFile.getPath());
+	                mazeProcessor.processMazeImage(currentFile.getPath().toString());
 	            } else {
 	                System.out.println("No image selected.");
 	            }
