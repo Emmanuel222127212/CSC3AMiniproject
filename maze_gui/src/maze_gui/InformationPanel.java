@@ -47,6 +47,24 @@ public class InformationPanel extends VBox{
 		setSpacing(10);
 		setButtons();
 		setPane();
+		setStyleAllign(this,"center");
+		setStyleAllign(menuBox,"center");
+		setButtonVisibility(true, false);
+	}
+	
+	
+	private void setButtonVisibility(boolean disable, boolean visible) {
+		attemptButton.setDisable(disable);
+		resetButton.setDisable(disable);
+		resultButton.setDisable(disable);
+		
+		attemptButton.setVisible(visible);
+		resetButton.setVisible(visible);
+		resultButton.setVisible(visible);
+	}
+	
+	private void setStyleAllign(Pane pane,String alignment) {
+		pane.setStyle(String.format("-fx-alignment : %s", alignment));
 	}
 	
 	public void change() {
@@ -111,9 +129,9 @@ public class InformationPanel extends VBox{
 						gc = canvas.getGraphicsContext2D();
 						gc.drawImage(image, 0,0,canvas.getWidth(),canvas.getHeight());
 						
-							game.setGraph(chosenFile,image.getWidth(),image.getHeight(),gc);	
+							game.setGraph(chosenFile,image.getWidth(),image.getHeight(),gc,image);	
 							
-					
+							setButtonVisibility(false, true);
 						
 					}else {
 						

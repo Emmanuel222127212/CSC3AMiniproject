@@ -5,6 +5,9 @@ import java.util.List;
 public class  Vertex <T> implements Postion<T> {
 
 	
+	
+	
+	
 	private T element;
 	private List<Edge<T>> OutgoingEdges;
 	private	int ListSize; 

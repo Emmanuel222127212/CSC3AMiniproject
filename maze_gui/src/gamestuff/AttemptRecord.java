@@ -9,19 +9,32 @@ import GraphADT.Vertex;
 public class AttemptRecord {
 	 private int AttemptNum;
 	 private int KeyCount = 0;
+	 private boolean Completed = false;
 	 private LocalTime starTime;
 	 private LocalTime endTime;
 	 private static int HOUR = 0;
 	 private static int MINUTE = 1;
 	 private static int SECOND = 2;
 	 private int[] performanceTime = new int[3];
-	 private ArrayList<String> Moves  = new ArrayList<String>();
+	 private GraphADT.ArrayList<String> Moves  = new GraphADT.ArrayList<String>();
 	 private GraphADT.ArrayList<Vertex<SuperPixel>> attemptpath;
 	 
 	 public AttemptRecord(int attempnum) {
 		 this.AttemptNum = attempnum;
 		 this.starTime = LocalTime.now();
 		 this.attemptpath = new GraphADT.ArrayList<Vertex<SuperPixel>>();
+	 }
+	 
+	 public boolean isComplete() {
+		 return this.Completed;
+	 }
+	 
+	 public void CompleteAttempt() {
+		this.Completed = true; 
+	 }
+	 
+	 public AttemptRecord() {
+		 
 	 }
 	 
 	 
@@ -36,7 +49,7 @@ public class AttemptRecord {
 		 this.Moves.add(move);
 	 }
 	 
-	 public ArrayList<String>  getMoves(){
+	 public GraphADT.ArrayList<String>  getMoves(){
 		 return this.Moves;
 	 }
 	 
@@ -95,7 +108,7 @@ public class AttemptRecord {
 	}
 	
 	public String format(int attempt, int move, LocalTime start, LocalTime end, int[] performance) {
-		return String.format("\n[Attempt number : %d, MoveCount : %d, start : %d:%d:%d, end : %d:%d:%d, performance : %dh%dm%ds]", attempt,move,start.getHour()
+		return String.format("\n[Attempt number : %d, Maze Completed : %b{\nMoveCount : %d, start : %d:%d:%d, end : %d:%d:%d, performance : %dh%dm%ds}]", attempt, Completed,move,start.getHour()
 				, start.getMinute(), start.getSecond(), end.getHour(),end.getMinute(), end.getSecond(),performance[HOUR],performance[MINUTE], performance[SECOND]);
 		
 	}
