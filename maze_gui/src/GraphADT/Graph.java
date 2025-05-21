@@ -269,6 +269,7 @@ public class Graph<T> {
 	}
 
 	// Helper method to build the path from end to start using the parent map
+
 	private ArrayList<Vertex<SuperPixel>> buildPath(HashTable<Integer, Vertex<SuperPixel>> parent,
 			Vertex<SuperPixel> end) {
 		// List to store the path
@@ -284,6 +285,7 @@ public class Graph<T> {
 
 		// Return the complete path from start to end
 		return path;
+
 	}
 
 
