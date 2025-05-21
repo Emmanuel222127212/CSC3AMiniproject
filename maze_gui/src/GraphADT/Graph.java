@@ -297,24 +297,6 @@ public class Graph<T> {
 	}
 
 	// Helper method to build the path from end to start using the parent map
-	private ArrayList<Vertex<SuperPixel>> buildPath(HashTable<Integer, Vertex<SuperPixel>> parent,
-			Vertex<SuperPixel> end) {
-		// List to store the path
-		ArrayList<Vertex<SuperPixel>> path = new ArrayList<>();
-		// Start from the end node
-		Vertex<SuperPixel> node = end;
-
-		// Keep adding each parent node to the front of the path list
-		while (node != null) {
-			path.add(0, node); // Add at the beginning to reverse the path
-			node = parent.get(node.GetElement().getId()); // Move to the parent
-		}
-
-		// Return the complete path from start to end
-		return path;
-	}
-
-	// Helper method to build the path from end to start using the parent map
 	private ArrayList<Vertex<SuperPixel>> buildPath(HashTable<Integer, Vertex<SuperPixel>> parent, Vertex<SuperPixel> end) {
 	    // List to store the path
 	    ArrayList<Vertex<SuperPixel>> path = new ArrayList<>();
