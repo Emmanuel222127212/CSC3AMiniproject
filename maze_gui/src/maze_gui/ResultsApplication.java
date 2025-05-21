@@ -18,15 +18,19 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class ResultsApplication extends Application {
-    private ImageView currentImage;
-    private MazeProcessor mazeProcessor;
-    private File currentFile;
-    private Button similarityButton = new Button("Show Similarity");
-    private Canvas overlaySimilarity;
-    private Pane imagePane;
-
-    public ResultsApplication(Image I) {
+public class ResultsApplication{ 
+	private ImageView currentImage;
+	private MazeProcessor mazeProcessor;
+	private File currentFile;
+	Button similarityButton = new Button("Show Similarity");
+	
+	//to show the similarity
+	Canvas overlaySimilarity ;
+	Pane imagePane ;
+	
+	public ResultsApplication(Image I)
+	{
+		
         currentImage = new ImageView(I);
         mazeProcessor = new MazeProcessor(currentImage);
         if (currentImage != null && currentImage.getImage() != null) {

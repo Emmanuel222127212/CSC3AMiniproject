@@ -88,15 +88,34 @@ public class MazeProcessor {
                         }
                     }
                 }
-                if (userSp.getAllPixels().size() > 0) {
-                    userSp.CalculateCetroids();
-                    if (userSp.GetType() == 1) {
-                        Vertex<SuperPixel> vertex = findVertexForSuperPixel(userSp);
-                        if (vertex != null) {
-                            userPath.add(vertex);
-                        }
+
+                
+                //changed here
+                if(systemSp.getAllPixels().size()>0)
+                {
+                	systemSp.CalculateCetroids();
+                	if(systemSp.GetType() == 1)
+                	{
+                		systemPx.add(systemSp);
+                	}
+                } 
+                
+                if(userSp.getAllPixels().size()>0)
+                {
+                	userSp.CalculateCetroids();
+                	if(systemSp.GetType() == 1)
+                	{
+                		userPX.add(userSp);
+                	}
+                } 
+              /*  if (hasPath)
+               *  {
+                    sp.CalculateCetroids(); // Sets centroids and type
+                    if (sp.GetType() == 1) { // Only add path superpixels (type 1)
+                        superPixelList.add(sp);
                     }
-                }
+                }*/
+
             }
         }
         System.out.println("Segmented user path with " + userPath.size() + " vertices");

@@ -20,13 +20,12 @@ public class PathFinder {
 	public Graph<SuperPixel> gp;
 	private String filepath;
 
-	public PathFinder(String filePath)
+	public PathFinder(Graph<SuperPixel> Graph,String fpath)
 	{
 
 
-		// Load the maze graph
-		this.filepath = filePath;
-		gp = new Graph<>(filepath);
+		this.filepath=fpath;
+		this.gp=Graph;
 
 
 	}
@@ -41,22 +40,27 @@ public class PathFinder {
 			System.out.println("No path found from start to end.");
 			return;
 		}
-		
+	
 		try {
 
 			ImagePreProcessor processor = new ImagePreProcessor(filepath);
-			BufferedImage background = processor.getProcessedImage();
+			BufferedImage original = processor.getProcessedImage();
 
+			
+			
+			int ScaledHeight=800;
+			int ScaledWidth=800;
+			
 			// Create overlay image
-			BufferedImage overlay = new BufferedImage(
-					background.getWidth(),
-					background.getHeight(),
+			BufferedImage scaledOverlay = new BufferedImage(
+					ScaledWidth,
+					ScaledHeight,
 					BufferedImage.TYPE_INT_RGB
 					);
 
 			// Create graphics context
-			Graphics2D g2 = overlay.createGraphics();
-			g2.drawImage(background, 0, 0, null);
+			Graphics2D g2 = scaledOverlay.createGraphics();
+			g2.drawImage(original, 0, 0,ScaledWidth,ScaledHeight, null);
 
 			// Enable anti-aliasing for smoother lines
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -84,7 +88,7 @@ public class PathFinder {
 			String fileName = new File(filepath).getName();
 			File output = new File("Converted/" + fileName);
 			output.getParentFile().mkdirs();
-			ImageIO.write(overlay, "png", output);
+			ImageIO.write(scaledOverlay, "png", output);
 			System.out.println("Solved maze written to " + output.getPath());
 
 		} catch (IOException e) {

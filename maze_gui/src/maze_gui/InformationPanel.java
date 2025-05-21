@@ -38,6 +38,7 @@ public class InformationPanel extends VBox{
 	
 
 	
+	
 	private Label name = new Label();
 	private File currentFile;
 	private Label menu = new Label(this.game.menu);
@@ -177,16 +178,17 @@ public class InformationPanel extends VBox{
 						}
 						
 						System.out.println("image set");	
-						//Find The Path Of The Image Selected
-						PathFinder pathFinder = new PathFinder("data/"+currentFile.getName());
-						pathFinder.findPath();
 						
-						canvas = new Canvas(image.getWidth(),image.getHeight());
+						
+						canvas = new Canvas(800,800);
 						s.getChildren().add(canvas);
 						gc = canvas.getGraphicsContext2D();
 						gc.drawImage(image, 0,0,canvas.getWidth(),canvas.getHeight());
 						
-							game.setGraph(currentFile,image.getWidth(),image.getHeight(),gc,image);	
+						double xScalingRatio =800/image.getWidth();
+						double yScalingRatio = 800/image.getHeight();
+						
+							game.setGraph(currentFile,image.getWidth(),image.getHeight(),gc,image,xScalingRatio,yScalingRatio);	
 							
 							setButtonVisibility(false, true);
 						

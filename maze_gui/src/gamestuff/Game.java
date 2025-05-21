@@ -7,6 +7,7 @@ import java.util.Arrays;
 import GraphADT.Edge;
 import GraphADT.SuperPixel;
 import GraphADT.Vertex;
+import PathFinding.PathFinder;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -96,14 +97,21 @@ public class Game {
 	
 	
 	
-	public void setGraph(File i,double width, double height, GraphicsContext gc,Image image) {
+	public void setGraph(File i,double width, double height, GraphicsContext gc,Image image,double scalingX,double scalingY) {
 	
 				this.gc = gc;
 				this.currentImage = image;
-				this.currentGraph = new GraphADT.Graph<SuperPixel>(i.getPath());
+				this.currentGraph = new GraphADT.Graph<SuperPixel>(i.getPath(),scalingX,scalingY);
+				//Find The Path Of The Image Selected
+				PathFinder pathFinder = new PathFinder(currentGraph,i.getPath());
+				pathFinder.findPath();
 				System.out.println("graph made");
 			
 				currentVertex = currentGraph.getStartVertex();
+				
+				//scale x and y pos to match that of the adjusted drawn image
+				
+				
 				int startx = currentGraph.getStartVertex().GetElement().getAvgPixelXPos();
 				int starty = currentGraph.getStartVertex().GetElement().getyAvgPixelYPos();
 				
