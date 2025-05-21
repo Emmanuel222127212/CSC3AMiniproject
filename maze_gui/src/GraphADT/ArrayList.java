@@ -52,13 +52,12 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 	}
 	
 	private void shiftElementsRight(int index) {
-		
-		for (int i = this.size; i >=index; i--) {
-				//dont need to expand as this is alays called after expansion
-					array[i]=array[i-1];
-			
-		}
+	    // Shift elements to the right starting from the end, up to the index
+	    for (int i = this.size; i > index; i--) {
+	        array[i] = array[i - 1];
+	    }
 	}
+
 	private void shiftElementsLeft(int index) {
 		
 		for (int i = index; i < size; i++) {
