@@ -86,7 +86,7 @@ public class SuperPixel {
 		return this.Type;
 	}
 
-	public void CalculateCetroids() {
+	public void CalculateCetroids(double xscale, double yscale) {
 		int xSum = 0;
 		int ySum = 0;
 
@@ -95,8 +95,8 @@ public class SuperPixel {
 			ySum += pixel.getYPos();
 		}
 
-		AvgPixelXPos = xSum / SuperPixelSize;
-		AvgPixelYPos = ySum / SuperPixelSize;
+		AvgPixelXPos = (int) (xscale*(xSum / SuperPixelSize));
+		AvgPixelYPos = (int) (yscale* (ySum / SuperPixelSize));
 
 		DetermineType();
 

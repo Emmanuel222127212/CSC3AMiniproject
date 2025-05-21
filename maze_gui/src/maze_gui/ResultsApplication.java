@@ -27,7 +27,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class ResultsApplication{
+public class ResultsApplication{ 
 	private ImageView currentImage;
 	private MazeProcessor mazeProcessor;
 	private File currentFile;

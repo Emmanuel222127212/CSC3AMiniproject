@@ -91,7 +91,7 @@ public class MazeProcessor {
                         }
                     }
                 }
-                
+
                 
                 //changed here
                 if(systemSp.getAllPixels().size()>0)
@@ -118,6 +118,7 @@ public class MazeProcessor {
                         superPixelList.add(sp);
                     }
                 }*/
+
             }
         }
         similarityDetector = new SimilarityDetector(userPX,systemPx, mazeImage);
