@@ -40,20 +40,10 @@ public class ResultsApplication{
 	public ResultsApplication(Image I)
 	{
 		
-        currentImage = new ImageView(I);
-        System.out.println("Error: Image is null!");
-        mazeProcessor =  new MazeProcessor(currentImage);
-        
-        if (currentImage != null && currentImage.getImage() != null) 
-        {
-            overlaySimilarity = new Canvas(currentImage.getImage().getWidth(), currentImage.getImage().getHeight());
-        } 
-        else
-        {
-            System.out.println("Image is not loaded yet, cannot create canvas.");
-        }
-        
-        imagePane = new Pane(currentImage,overlaySimilarity);
+		        currentImage = new ImageView(I);
+		  
+
+		mazeProcessor =  new MazeProcessor(currentImage);
 	}
 	
 	public ResultsApplication(File i) 

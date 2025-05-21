@@ -12,6 +12,7 @@ import PathFinding.PathFinder;
 import gamestuff.AttemptRecord;
 import gamestuff.Game;
 import image_preprocessing.ImagePreProcessor;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -65,15 +66,14 @@ public class InformationPanel extends VBox{
 		setButtonVisibility(true, false);
 		setAllButtonStyles();
 		revealButton.setDisable(true);
+		resetButton.setDisable(true);
+		resultButton.setDisable(true);
 	}
 	
 	
 	private void setButtonVisibility(boolean disable, boolean visible) {
 		attemptButton.setDisable(disable);
-		resetButton.setDisable(disable);
-		resultButton.setDisable(disable);
-		 
-		
+	
 		attemptButton.setVisible(visible);
 		resetButton.setVisible(visible);
 		revealButton.setVisible(visible);
@@ -128,6 +128,8 @@ public class InformationPanel extends VBox{
 					game.startRound(attempts,s);
 					
 					revealButton.setDisable(false);
+					resetButton.setDisable(false);
+					resultButton.setDisable(false);
 				});
 	}
 	
@@ -146,7 +148,9 @@ public class InformationPanel extends VBox{
 	
 	public void SelectImage(Pane s) {
 		//select image button
+		
 				selectButton.setOnAction(e -> {
+					
 					FileChooser pickFile = new FileChooser();
 					pickFile.setInitialDirectory(new File("./data"));
 					pickFile.setTitle("Pick Maze");
@@ -179,11 +183,22 @@ public class InformationPanel extends VBox{
 						
 						System.out.println("image set");	
 						
+
+						//remove any canvas before
+						for(Node node : s.getChildren()) {
+							if(node instanceof Canvas) {
+							Platform.runLater(()->{
+								s.getChildren().remove(node);
+							});
+							}
+						}
 						
 						canvas = new Canvas(800,800);
+
 						s.getChildren().add(canvas);
 						gc = canvas.getGraphicsContext2D();
-						gc.drawImage(image, 0,0,canvas.getWidth(),canvas.getHeight());
+						
+						
 						
 						double xScalingRatio =800/image.getWidth();
 						double yScalingRatio = 800/image.getHeight();
@@ -211,7 +226,11 @@ public class InformationPanel extends VBox{
 	
 	public void setResults() {
 		resetButton.setOnAction(e -> {
-
+			if(game.getplayerRecords() != null) {
+				game.reset(attempts);
+			}else {
+				
+			}
 		});
 
 		//result button 

@@ -73,6 +73,11 @@ public class gui_main extends Application{
 		
 		VBox start = new VBox();
 		TextArea name =new TextArea("Enter Your Name");
+		name.setOnKeyPressed(e->{
+			if(name.getText().equals("Enter Your Name")) {
+				name.clear();
+			}
+		});
 		name.setMaxHeight(10);
 		Scene startScene = new Scene(start);
 
