@@ -99,6 +99,7 @@ public class SuperPixel {
 		AvgPixelYPos = ySum / SuperPixelSize;
 
 		DetermineType();
+
 	}
 
 	private void DetermineType() {
@@ -111,11 +112,13 @@ public class SuperPixel {
 		}
 		Avgintensity = intensitySum / SuperPixelSize;
 
-		if (Avgintensity > 128) {
+		if (Avgintensity > 100) {
 			Type = 1; // Paths
 		} else {
 			Type = 2; // Walls
 		}
+		
+		
 
 	}
 	

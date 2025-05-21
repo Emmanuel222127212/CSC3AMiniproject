@@ -41,7 +41,7 @@ public class PathFinder {
 			System.out.println("No path found from start to end.");
 			return;
 		}
-		
+	
 		try {
 
 			ImagePreProcessor processor = new ImagePreProcessor(filepath);
