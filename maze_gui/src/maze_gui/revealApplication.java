@@ -47,7 +47,13 @@ public class revealApplication{
 
 	            if (newFile.exists()) {
 	                Image newImage = new Image(newFile.toURI().toString());
-	                currentImage.setImage(newImage);   
+	             
+	                currentImage.setFitWidth(800);
+	                currentImage.setFitHeight(800);
+	                currentImage.setPreserveRatio(true);
+	                currentImage.setSmooth(true);
+	                currentImage.setCache(true);
+	                currentImage.setImage(newImage);  
 	                System.out.println("Updated image view with path: " + newPath);
 	            } else {
 	                System.out.println("Processed file not found at: " + newPath);

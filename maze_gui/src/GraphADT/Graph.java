@@ -30,8 +30,10 @@ public class Graph<T> {
 	 * assume image passed though is already grey scaled
 	 * 
 	 * @param FileName the filename
+	 * @param scalingY 
+	 * @param scalingX 
 	 */
-	public Graph(String FileName) {
+	public Graph(String FileName, double scalingX, double scalingY) {
 
 		ImagePreProcessor test = new ImagePreProcessor(FileName);
 		BufferedImage ReadGrey = test.getProcessedImage();// convert image to greyscale
@@ -53,41 +55,11 @@ public class Graph<T> {
 		boolean[][] EdgesFound = EdgeDetect(ReadGrey); // locate all the edges in the image(all walls and out of bounds
 														// areas)
 
-		ConstructConnectedGraph(EdgesFound, ReadGrey); // Use the edges and grey scale to construct superpixels and
+		ConstructConnectedGraph(EdgesFound, ReadGrey,scalingX,scalingY); // Use the edges and grey scale to construct superpixels and
 														// connect
-		// each vertex and edge
+														// each vertex and edge
 
-		// Convert grayscale image to RGB copy
-		BufferedImage rgbImage = new BufferedImage(Imgwidth, Imgheight, BufferedImage.TYPE_INT_RGB);
 
-		// Fill the image with grayscale values (if it's grayscale)
-		for (int y = 0; y < Imgheight; y++) {
-			for (int x = 0; x < Imgwidth; x++) {
-				int gray = new Color(ReadGrey.getRGB(x, y)).getRed(); // Get grayscale value
-				Color grayColor = new Color(gray, gray, gray);
-				rgbImage.setRGB(x, y, grayColor.getRGB());
-			}
-		}
-
-		for (Vertex<SuperPixel> vertex : SuperPixelList) {
-			SuperPixel sp = vertex.GetElement(); // Get the SuperPixel object from the vertex
-			Color color = new Color(120, 100, 120); // Random color for each
-
-			for (Pixel p : sp.getAllPixels()) {
-				int x = p.getXPos();
-				int y = p.getYPos();
-
-				if (sp.GetType() == 1) {
-
-					rgbImage.setRGB(x, y, color.getRGB()); // Set pixel color for each pixel in superpixel
-				}
-			}
-
-		}
-
-		ConstructConnectedGraph(EdgesFound, ReadGrey); // Use the edges and grey scale to construct superpixels and
-														// connect
-		// each vertex and edge
 
 		findStartAndEndFromEdges(ReadGrey);
 
@@ -314,23 +286,6 @@ public class Graph<T> {
 		return path;
 	}
 
-	// Helper method to build the path from end to start using the parent map
-	private ArrayList<Vertex<SuperPixel>> buildPath(HashTable<Integer, Vertex<SuperPixel>> parent, Vertex<SuperPixel> end) {
-	    // List to store the path
-	    ArrayList<Vertex<SuperPixel>> path = new ArrayList<>();
-	    // Start from the end node
-	    Vertex<SuperPixel> node = end;
-
-	    // Keep adding each parent node to the front of the path list
-	    while (node != null) {
-	        path.add(0, node); // Add at the beginning to reverse the path
-	        node = parent.get(node.GetElement().getId()); // Move to the parent
-	    }
-
-	    // Return the complete path from start to end
-	    return path;
-	}
-
 
 	/**
 	 * Method for getting the starting vertex
@@ -537,7 +492,7 @@ public class Graph<T> {
 	 * @param DetectedEdges Array of all entries marked as borders/edges
 	 * @param img           Image beign worked with
 	 */
-	private void ConstructConnectedGraph(boolean[][] DetectedEdges, BufferedImage img) {
+	private void ConstructConnectedGraph(boolean[][] DetectedEdges, BufferedImage img,double xscale,double yscale) {
 		boolean[][] visitedIndices = new boolean[this.Imgheight][this.Imgwidth]; // Mark the entries that have already
 																					// been visited
 		int[][] pixelToSuperMap = new int[this.Imgheight][this.Imgwidth]; // Create ID blobs for superpixels to know
@@ -552,7 +507,7 @@ public class Graph<T> {
 					// Call method that takes in the current X and Y location,the visted pixel,the
 					// detected borders and the map
 					// Uses them to create a SuperPixel
-					SuperPixel toAdd = GrowSuperPixel(x, y, DetectedEdges, visitedIndices, img, pixelToSuperMap);
+					SuperPixel toAdd = GrowSuperPixel(x, y, DetectedEdges, visitedIndices, img, pixelToSuperMap,xscale,yscale);
 
 					addSuperPixel(toAdd); // Add superPixel to adjacency list
 
@@ -677,13 +632,15 @@ public class Graph<T> {
 	 *                          exists
 	 * @param visitedCollection 2D array containing all viisted pixel entries
 	 * @param img               Image currently being worked with
+	 * @param yscale 
+	 * @param xscale 
 	 * @param 2D                array containing ids that form regions of the
 	 *                          superpixels (used to mark where one superpixel
 	 *                          starts and another begins)
 	 * @return The SuperPixel Created
 	 */
 	private SuperPixel GrowSuperPixel(int InitX, int InitY, boolean[][] EdgeCollection, boolean[][] visitedCollection,
-			BufferedImage img, int[][] superPixelMap) {
+			BufferedImage img, int[][] superPixelMap, double xscale, double yscale) {
 
 		LinkedQueue<Pixel> queue = new LinkedQueue<Pixel>(); // Create queue to use for BFS
 		SuperPixel SP = new SuperPixel(); // Initial SuperPixel creation
@@ -723,7 +680,7 @@ public class Graph<T> {
 			}
 
 		}
-		SP.CalculateCetroids(); // Calculate the avg X and Y Pos for a SuperPixel
+		SP.CalculateCetroids(xscale,yscale); // Calculate the avg X and Y Pos for a SuperPixel
 
 		return SP;
 	}

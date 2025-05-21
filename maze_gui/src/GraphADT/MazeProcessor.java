@@ -66,12 +66,7 @@ public class MazeProcessor {
                         }
                     }
                 }
-                if (hasPath) {
-                    sp.CalculateCetroids(); // Sets centroids and type
-                    if (sp.GetType() == 1) { // Only add path superpixels (type 1)
-                        superPixelList.add(sp);
-                    }
-                }
+              
             }
         }
         similarityDetector = new SimilarityDetector(superPixelList, mazeImage);
