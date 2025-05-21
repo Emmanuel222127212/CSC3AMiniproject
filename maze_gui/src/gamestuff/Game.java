@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 
@@ -19,11 +20,17 @@ public class Game {
 	
 	int keyCount = 0;
 	private User player;
+
 	
-	
+	//graph stuff
+	private Image currentImage;
+
+	private Image characterImage = new Image("/utilityImg/ujLogo.png");
+
 	private GraphADT.Graph<SuperPixel> currentGraph;
 	private GraphicsContext gc;
 	private Vertex<SuperPixel> currentVertex;
+	
 	
 	public static String menu = 
 		    "Press 'Select Maze' to choose a maze.\n" +
@@ -48,18 +55,35 @@ public class Game {
 		return player.getName();
 	}
 	
-	public ArrayList<AttemptRecord> getplayerRecords(){
+	public GraphADT.ArrayList<AttemptRecord> getplayerRecords(){
 		return player.getAttempts();
 	}
 	
+	
+	
+	/**
+	 * @return the currentImage
+	 */
+	public Image getCurrentImage() {
+		return currentImage;
+	}
+
+	/**
+	 * @param currentImage the currentImage to set
+	 */
+	public void setCurrentImage(Image currentImage) {
+		this.currentImage = currentImage;
+	}
+
 	public int numberOfAttempts() {
 		return player.numberOfAttempts();
 	}
 	
 	public void startRound(TextArea t,Scene s) {
 		AttemptRecord pRecord = new AttemptRecord(player.numberOfAttempts());
-		 player.setCurrentAttempt(pRecord);
 		
+		 player.setCurrentAttempt(pRecord);
+		 player.getCurrentAttempt().addToPath(currentGraph.getStartVertex());
 		System.out.println("listening..");
 		keyCount = 0;
 		s.getRoot().requestFocus();
@@ -72,17 +96,17 @@ public class Game {
 	
 	
 	
-	public void setGraph(File i,double width, double height, GraphicsContext gc) {
+	public void setGraph(File i,double width, double height, GraphicsContext gc,Image image) {
 	
 				this.gc = gc;
-		
+				this.currentImage = image;
 				this.currentGraph = new GraphADT.Graph<SuperPixel>(i.getPath());
 				System.out.println("graph made");
 			
 				currentVertex = currentGraph.getStartVertex();
 				int startx = currentGraph.getStartVertex().GetElement().getAvgPixelXPos();
 				int starty = currentGraph.getStartVertex().GetElement().getyAvgPixelYPos();
-				player.getCurrentAttempt().addToPath(currentVertex);
+				
 				player.setCurrentx(startx);
 				player.setCurrenty(starty);
 				gc.fillRect(startx,starty,10,10);	
@@ -100,7 +124,7 @@ public class Game {
 	
 	
 	public void reset() {
-		this.player.getAttempts().clear();
+		this.player.setAttempts(new GraphADT.ArrayList<AttemptRecord>());;
 	}
 	
 	public String DisplayAttempts(int numberOfAttempts) {
@@ -170,13 +194,28 @@ public class Game {
 				}
 				
 				if(foundNextVertex && nextVert.GetElement().GetType() == 1) {
+					
+					
 					currentVertex = nextVert;
 					System.out.println("found nextvert");
 							moved= true;
 							player.setCurrentx(nextVert.GetElement().getAvgPixelXPos() );
 							player.setCurrenty(nextVert.GetElement().getyAvgPixelYPos());
-							gc.fillRect(player.getCurrentx(), player.getCurrenty(), 10, 10);
+							//draw movement will be done like this
+							//gc.fillRect(player.getCurrentx(), player.getCurrenty(), 10, 10);
+							
+							drawMovement(player.getCurrentx(), player.getCurrenty());
 							player.getCurrentAttempt().addToPath(nextVert);
+							
+							
+							GraphADT.ArrayList<Vertex<SuperPixel>> playerPath = player.getCurrentAttempt().getAttemptPath();
+							
+							//checking if player is done
+						if(playerPath.get(playerPath.size()-1).GetElement().compare(currentGraph.getEndVertex().GetElement()) == 0) {
+							player.getCurrentAttempt().CompleteAttempt();
+						}
+						
+						
 				}else {
 					System.out.println("not next");
 					System.out.println(" the type is " +  nextVert.GetElement().GetType());
@@ -197,7 +236,17 @@ public class Game {
 		
 	}
 	
+	
+	private void drawMovement(int x , int y) {
+		gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
+		gc.drawImage(currentImage, 0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
+		gc.drawImage(characterImage,x, y, 15, 15);
+	}
+	
 	public void moveInGame(String move, TextArea t,javafx.scene.input.KeyEvent event) {
+		
+		
+		
 		if((!move.equals("ESCAPE") && !move.equals("ENTER")) &&  Arrays.asList(moveList).contains(move)) {
 			keyCount++;
 			//t.appendText("\nKey count: " + keyCount);
@@ -208,7 +257,7 @@ public class Game {
 		
 			
 			
-		}else if(move.equals("ESCAPE") || move.equals("ENTER")) {
+		}else if(move.equals("ESCAPE") || move.equals("ENTER") || player.getCurrentAttempt().isComplete()) {
 			player.setCurrentx(0);
 			player.setCurrenty(0);
 			player.getCurrentAttempt().endAttempt();
@@ -216,7 +265,7 @@ public class Game {
 			t.clear();
 			t.appendText(DisplayAttempts(0));
 			System.out.println(DisplayAttempts(0));
-			t.requestFocus();
+			
 			//attempts.appendText(pRecord);
 			
 

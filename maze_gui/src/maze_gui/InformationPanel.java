@@ -17,6 +17,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -29,6 +30,7 @@ public class InformationPanel extends VBox{
 
 	
 	private Label name = new Label();
+	private File currentFile;
 	private Label menu = new Label(this.game.menu);
 	private Label attemptProgress = new Label();
 	private TextArea attempts = new TextArea();
@@ -47,6 +49,40 @@ public class InformationPanel extends VBox{
 		setSpacing(10);
 		setButtons();
 		setPane();
+		setStyleAllign(this);
+		setStyleAllign(menuBox);
+		setButtonVisibility(true, false);
+		setAllButtonStyles();
+	}
+	
+	
+	private void setButtonVisibility(boolean disable, boolean visible) {
+		attemptButton.setDisable(disable);
+		resetButton.setDisable(disable);
+		resultButton.setDisable(disable);
+		
+		attemptButton.setVisible(visible);
+		resetButton.setVisible(visible);
+		resultButton.setVisible(visible);
+	}
+	
+	//Pane Handling stuff
+	
+	private void setAllButtonStyles() {
+		setButtonStyle(selectButton);
+		setButtonStyle(attemptButton);
+		setButtonStyle(resetButton);
+		setButtonStyle(resultButton);
+	}
+	
+	private void setButtonStyle( Button btn) {
+		
+		btn.getStyleClass().add(".button");
+		btn.setPrefSize(500, 10);
+	}
+	
+	private void setStyleAllign(Pane pane) {
+		pane.getStyleClass().add(".vbox");
 	}
 	
 	public void change() {
@@ -100,10 +136,10 @@ public class InformationPanel extends VBox{
 					
 					Stage stage = new Stage();
 					
-					File chosenFile = pickFile.showOpenDialog(stage);
+					 currentFile = pickFile.showOpenDialog(stage);
 					
-					if(chosenFile != null && chosenFile.getAbsolutePath().endsWith(".png")) {
-						Image image = new Image(chosenFile.toURI().toString());
+					if(currentFile != null && (currentFile.getAbsolutePath().endsWith(".png") || currentFile.getAbsolutePath().endsWith(".jpg"))) {
+						Image image = new Image(currentFile.toURI().toString());
 						
 						System.out.println("image set");	
 						canvas = new Canvas(image.getWidth(),image.getHeight());
@@ -111,9 +147,9 @@ public class InformationPanel extends VBox{
 						gc = canvas.getGraphicsContext2D();
 						gc.drawImage(image, 0,0,canvas.getWidth(),canvas.getHeight());
 						
-							game.setGraph(chosenFile,image.getWidth(),image.getHeight(),gc);	
+							game.setGraph(currentFile,image.getWidth(),image.getHeight(),gc,image);	
 							
-					
+							setButtonVisibility(false, true);
 						
 					}else {
 						
@@ -123,20 +159,29 @@ public class InformationPanel extends VBox{
 	}
 	private void setButtons() {
 		//reset button
-		resetButton.setOnAction(e -> {
+		setResults();
+		
+		
+	}
+	
+	
+	public void setResults() {
+resetButton.setOnAction(e -> {
 			
 		});
 		
 		//result button 
 		resultButton.setOnAction(e -> {
+			//Image imageView = new Image(new File("./Data/946.png").toURI().toString());
+			ResultsApplication resultsApplication = new ResultsApplication(currentFile);
+			
+				resultsApplication.startWin();
 			
 		});
-		
-		
 	}
 
 	private void setTextArea() {
-		this.attempts.setDisable(true);
+		this.attempts.setEditable(false);
 		int width = 1000;
 		this.attempts.setMaxSize(width, width * 100 );
 		

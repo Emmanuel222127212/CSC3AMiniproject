@@ -1,11 +1,11 @@
 package gamestuff;
 
-import java.util.ArrayList;
+
 
 public class User {
 	private String name;
 	private AttemptRecord currentAttempt;
-	private ArrayList<AttemptRecord> attempts = new ArrayList<AttemptRecord>();
+	private GraphADT.ArrayList<AttemptRecord> attempts = new GraphADT.ArrayList<AttemptRecord>();
 	int currentx = 0;
 	int currenty =0;
 	
@@ -61,13 +61,13 @@ public class User {
 	/**
 	 * @return the attempts
 	 */
-	public ArrayList<AttemptRecord> getAttempts() {
+	public GraphADT.ArrayList<AttemptRecord> getAttempts() {
 		return attempts;
 	}
 	/**
 	 * @param attempts the attempts to set
 	 */
-	public void setAttempts(ArrayList<AttemptRecord> attempts) {
+	public void setAttempts(GraphADT.ArrayList<AttemptRecord> attempts) {
 		this.attempts = attempts;
 	}
 	
