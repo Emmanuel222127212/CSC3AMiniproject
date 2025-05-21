@@ -99,6 +99,14 @@ public class SuperPixel {
 		AvgPixelYPos = ySum / SuperPixelSize;
 
 		DetermineType();
+		int intensitySum = 0;
+		int Avgintensity = 0;
+
+		for (Pixel pixel : PixelList) {
+			intensitySum += pixel.getIntensity();
+		}
+		Avgintensity = intensitySum / SuperPixelSize;
+
 	}
 
 	private void DetermineType() {
@@ -116,6 +124,8 @@ public class SuperPixel {
 		} else {
 			Type = 2; // Walls
 		}
+		
+		
 
 	}
 	

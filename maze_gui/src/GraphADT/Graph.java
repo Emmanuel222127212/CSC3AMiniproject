@@ -84,47 +84,10 @@ public class Graph<T> {
 
 		}
 		
-		// Create a copy of the original image to overlay edges
-		BufferedImage edgeOverlay = new BufferedImage(rgbImage.getWidth(), rgbImage.getHeight(),
-				BufferedImage.TYPE_INT_RGB);
-		Graphics g = edgeOverlay.getGraphics();
-		g.drawImage(rgbImage, 0, 0, null); // Draw the original image as the background
 
-		// Iterate through the list of edges and draw each edge
+		
 
-		for (Vertex<SuperPixel> Sp : this.SuperPixelList) {
-			for (Edge edge : Sp.EdgeList()) {
-				// Get the 'from' and 'to' vertices of the edge
-				@SuppressWarnings("unchecked")
-				Vertex<SuperPixel> fromVertex = edge.getVertFrom();
-				@SuppressWarnings("unchecked")
-				Vertex<SuperPixel> toVertex = edge.getVertTO();
-
-				// Extract coordinates of each vertex (centroids)
-				int fromX = fromVertex.GetElement().getAvgPixelXPos();
-				int fromY = fromVertex.GetElement().getyAvgPixelYPos();
-				int toX = toVertex.GetElement().getAvgPixelXPos();
-				int toY = toVertex.GetElement().getyAvgPixelYPos();
-
-				// Draw a red line between the 'from' and 'to' vertices
-				g.setColor(Color.blue);
-				g.drawLine(fromX, fromY, toX, toY);
-
-				 
-			}
-
-		}
-
-		g.dispose(); // Clean up graphics
-
-		// Save final image
-		try {
-		 
-			ImageIO.write(edgeOverlay, "png", new File("Output_maze.png"));
-		 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	
 
 		ConstructConnectedGraph(EdgesFound, ReadGrey); // Use the edges and grey scale to construct superpixels and
 														// connect
@@ -132,6 +95,9 @@ public class Graph<T> {
 
 
 		findStartAndEndFromEdges(ReadGrey);
+		
+
+
 	}
 
 	// Returns a rectangle bounding the maze based on border pixels.
@@ -379,6 +345,7 @@ public class Graph<T> {
 		Edge<SuperPixel> Edgebtween = new Edge<SuperPixel>(a, b);
 
 		// Add edge to both as graph is undirected
+		
 		a.AddEdge(Edgebtween);
 		b.AddEdge(Edgebtween);
 		edgecount++;
@@ -442,47 +409,18 @@ public class Graph<T> {
 		// 0 otherwise
 
 		boolean[][] DetectedEdges = new boolean[Imgheight][Imgwidth];
+		
 
 		for (int y = 0; y < Imgheight; y++) {
 			for (int x = 0; x < Imgwidth; x++) {
 				// C,R because it wants x then Y
 				int CPixelIntensity = new Color(img.getRGB(x, y)).getRed(); // greyscale has only intensity so the value
-				// the same for all 3 colour is same
-
-				// Check if pixels are on the edges of the image
-				// if they arent can do the normal operations
+			
 				if (IsInImage(y, x)) {
-
-					// Get 6 pixels that are adjacent to current pixel
-					int[] AdjacentPixels = GetAdjacentIntesities(img, y, x);
-
-					// Used to check if an edge was found if it was use it to place wall edges
-					boolean EdgeDtected = false;
-					for (int i = 0; i < 6; i++) {
-
-						// If theres a large intensity change we've found a path-wall border
-						if (Math.abs(CPixelIntensity - AdjacentPixels[i]) > Threshhold) {
-
-							EdgeDtected = true;
-							break;
-						}
+					if(CPixelIntensity<Threshhold) {
+						DetectedEdges[y][x]=true;
 					}
-					if (EdgeDtected == true) {
-
-						DetectedEdges[y][x] = true;
-
-					} else {
-
-						DetectedEdges[y][x] = false;
-
-					}
-
-				} else if (!IsInImage(y, x) && CPixelIntensity == 255) {
-					DetectedEdges[y][x] = false;
-				} else if (!IsInImage(y, x) && CPixelIntensity == 0) {
-					DetectedEdges[y][x] = true;
 				}
-
 			}
 
 		}
@@ -602,7 +540,9 @@ public class Graph<T> {
 						// Ensure both vertices are'nt null
 						// Add an edge if they arent
 						if (toAddEdgeA != null && toAddEdgeB != null) {
+							
 							addEdge(toAddEdgeA, toAddEdgeB);
+							
 						}
 
 					}
@@ -682,6 +622,7 @@ public class Graph<T> {
 
 		}
 		SP.CalculateCetroids(); // Calculate the avg X and Y Pos for a SuperPixel
+		
 
 		return SP;
 	}
