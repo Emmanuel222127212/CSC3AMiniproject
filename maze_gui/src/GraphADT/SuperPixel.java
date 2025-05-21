@@ -99,13 +99,6 @@ public class SuperPixel {
 		AvgPixelYPos = ySum / SuperPixelSize;
 
 		DetermineType();
-		int intensitySum = 0;
-		int Avgintensity = 0;
-
-		for (Pixel pixel : PixelList) {
-			intensitySum += pixel.getIntensity();
-		}
-		Avgintensity = intensitySum / SuperPixelSize;
 
 	}
 
@@ -119,7 +112,7 @@ public class SuperPixel {
 		}
 		Avgintensity = intensitySum / SuperPixelSize;
 
-		if (Avgintensity > 128) {
+		if (Avgintensity > 100) {
 			Type = 1; // Paths
 		} else {
 			Type = 2; // Walls

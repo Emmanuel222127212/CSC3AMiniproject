@@ -16,11 +16,17 @@ public class Edge<T> {
 			SuperPixel Temp1 = (SuperPixel) VertFrom.GetElement();
 			SuperPixel Temp2 = (SuperPixel) VertTO.GetElement();
 			
+			if(Temp1.GetType()!=Temp2.GetType() ) {
+				this.weight=100000;
+			}else {
+				
+			
+			
 			double SquaredX = Math.pow((Temp1.getAvgPixelXPos()-Temp2.getAvgPixelXPos()), 2);
 			double SquaredY = Math.pow((Temp1.getyAvgPixelYPos()-Temp2.getyAvgPixelYPos()), 2);
 
 			this.weight= Math.abs(Math.sqrt(SquaredX+SquaredY));
-			
+			}
 		}else {
 			System.err.println("Invalid Vertices");
 			

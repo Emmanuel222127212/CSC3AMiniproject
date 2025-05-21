@@ -21,19 +21,20 @@ public class Graph<T> {
 	static int edgecount = 0;
 	// 0 black
 	// 255 white
-	private final int Threshhold = 150;
+	private final int Threshhold = 100;
 	private final int MAXSUPERPIXELAMOUNT = 16; // edges are usually 2 pixels on each end so 4 pixels per "Block"
 	private Vertex<SuperPixel> startVertex = null;
 	private Vertex<SuperPixel> endVertex = null;
- 
+
 	/**
 	 * assume image passed though is already grey scaled
+	 * 
 	 * @param FileName the filename
 	 */
 	public Graph(String FileName) {
 
-		ImagePreProcessor test=new ImagePreProcessor(FileName); 
-		BufferedImage ReadGrey =test.getProcessedImage();// convert image to greyscale
+		ImagePreProcessor test = new ImagePreProcessor(FileName);
+		BufferedImage ReadGrey = test.getProcessedImage();// convert image to greyscale
 
 		Imgheight = ReadGrey.getHeight(); // get height
 		Imgwidth = ReadGrey.getWidth(); // get width
@@ -52,9 +53,9 @@ public class Graph<T> {
 		boolean[][] EdgesFound = EdgeDetect(ReadGrey); // locate all the edges in the image(all walls and out of bounds
 														// areas)
 
-
-		ConstructConnectedGraph(EdgesFound, ReadGrey); // Use the edges and grey scale to construct superpixels and connect
-												// each vertex and edge
+		ConstructConnectedGraph(EdgesFound, ReadGrey); // Use the edges and grey scale to construct superpixels and
+														// connect
+		// each vertex and edge
 
 		// Convert grayscale image to RGB copy
 		BufferedImage rgbImage = new BufferedImage(Imgwidth, Imgheight, BufferedImage.TYPE_INT_RGB);
@@ -83,20 +84,12 @@ public class Graph<T> {
 			}
 
 		}
-		
-
-		
-
-	
 
 		ConstructConnectedGraph(EdgesFound, ReadGrey); // Use the edges and grey scale to construct superpixels and
 														// connect
 		// each vertex and edge
 
-
 		findStartAndEndFromEdges(ReadGrey);
-		
-
 
 	}
 
@@ -104,15 +97,19 @@ public class Graph<T> {
 	private Rectangle getMazeBounds(BufferedImage image) {
 		int width = image.getWidth();
 		int height = image.getHeight();
-		int top = height, bottom = 0, left = width, right = 0;
+		int top = height, bottom = 0, left = width, right = 0; // reverse search so to speak
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				int rgb = image.getRGB(x, y) & 0xFF;
 				if (rgb < 100) { // Consider dark pixels as walls.
-					if (x < left) left = x;
-					if (x > right) right = x;
-					if (y < top) top = y;
-					if (y > bottom) bottom = y;
+					if (x < left)
+						left = x;
+					if (x > right)
+						right = x;
+					if (y < top)
+						top = y;
+					if (y > bottom)
+						bottom = y;
 				}
 			}
 		}
@@ -125,14 +122,13 @@ public class Graph<T> {
 
 	// Finds start and end vertices by scanning the perimeter of the maze.
 	public void findStartAndEndFromEdges(BufferedImage image) {
-		 
+
 		Rectangle mazeBounds = getMazeBounds(image);
 		int left = mazeBounds.x;
 		int right = left + mazeBounds.width - 1;
 		int top = mazeBounds.y;
 		int bottom = top + mazeBounds.height - 1;
 
-		 
 		// Search top edge for start vertex.
 		for (int x = left; x <= right; x++) {
 			if (isPathPixel(image.getRGB(x, top))) {
@@ -191,111 +187,155 @@ public class Graph<T> {
 	}
 
 	/**
-	 * Makes a path shorter by keeping only some of the points.
-	 * This method goes through the given path and keeps every 4th SuperPixel 
-	 * (or whatever value is set in STEP) to make the path simpler.
-	 * It also makes sure the last point in the original path is always included, 
-	 * even if it was skipped.
+	 * Makes a path shorter by keeping only some of the points. This method goes
+	 * through the given path and keeps every 4th SuperPixel (or whatever value is
+	 * set in STEP) to make the path simpler. It also makes sure the last point in
+	 * the original path is always included, even if it was skipped.
+	 * 
 	 * @param path The original list of SuperPixel vertices (the full path)
 	 * @return A shorter version of the path
 	 */
 	public GraphADT.ArrayList<Vertex<SuperPixel>> simplifyPath(GraphADT.ArrayList<Vertex<SuperPixel>> path) {
-	    // If the path has fewer than 2 points, return it as is - would'nt make sense to skip pixels if our path is that short
-	    if (path.size() < 2) return path;
+		// If the path has fewer than 2 points, return it as is - would'nt make sense to
+		// skip pixels if our path is that short
+		if (path.size() < 2)
+			return path;
 
 		GraphADT.ArrayList<Vertex<SuperPixel>> simple = new GraphADT.ArrayList<Vertex<SuperPixel>>();
 
-	 // Only keep every 4th point from the path - (i was trying to minimise/reduce the  lines in the path)
-	    int STEP = 4;  
+		// Only keep every 4th point from the path - (i was trying to minimise/reduce
+		// the lines in the path)
+		int STEP = 4;
 
-	    // Go through the path, jumping by STEP each time
-	    for (int i = 0; i < path.size(); i += STEP) {
-	        simple.add(path.get(i)); // Add the selected point to the simplified path
-	    }
+		// Go through the path, jumping by STEP each time
+		for (int i = 0; i < path.size(); i += STEP) {
+			simple.add(path.get(i)); // Add the selected point to the simplified path
+		}
 
-	 // Get the last point in the original path - there'll be cases where we skip over the end vertex 
-	 //so we're trying to make sure that our path is connected from start - middle to end
-	    Vertex<SuperPixel> last = path.get(path.size() - 1); 
+		// Get the last point in the original path - there'll be cases where we skip
+		// over the end vertex
+		// so we're trying to make sure that our path is connected from start - middle
+		// to end
+		Vertex<SuperPixel> last = path.get(path.size() - 1);
 
-	    // If the last point was not already added, add it now
-	    if (simple.get(simple.size() - 1) != last) {
-	        simple.add(last);
-	    }
+		// If the last point was not already added, add it now
+		if (simple.get(simple.size() - 1) != last) {
+			simple.add(last);
+		}
 
-	 // Return the simplified path
-	    return simple; 
+		// Return the simplified path
+		return simple;
 	}
 
-	
 	/**
-	 * Finds a path from the start SuperPixel to the end SuperPixel using breadth-first search (BFS).
-	 * The method looks for the shortest path by checking all possible paths, step by step.
-	 * It returns the first path that reaches the end SuperPixel.
+	 * Finds a path from the start SuperPixel to the end SuperPixel using
+	 * breadth-first search (BFS). The method looks for the shortest path by
+	 * checking all possible paths, step by step. It returns the first path that
+	 * reaches the end SuperPixel.
+	 * 
 	 * @return A list of SuperPixel vertices that form the path from start to end.
 	 *         If no path is found or start/end is missing, returns an empty list.
 	 */
 	public ArrayList<Vertex<SuperPixel>> findPath() {
-	    ArrayList<Vertex<SuperPixel>> path = new ArrayList<>();
+		// Create a list to store the final path from start to end
+		ArrayList<Vertex<SuperPixel>> path = new ArrayList<>();
 
-	    if (startVertex == null || endVertex == null) {
-	        return path;
-	    }
+		// If either start or end is missing, return an empty path
+		if (startVertex == null || endVertex == null) {
+			return path;
+		}
 
-	    LinkedQueue<Vertex<SuperPixel>> queue = new LinkedQueue<>();
-	    ArrayList<Vertex<SuperPixel>> visited = new ArrayList<>();
-	    HashTable<Integer, Vertex<SuperPixel>> parent = new HashTable<>();
+		// Queue for BFS
+		LinkedQueue<Vertex<SuperPixel>> queue = new LinkedQueue<>();
+		// List to keep track of visited vertices
+		ArrayList<Vertex<SuperPixel>> visited = new ArrayList<>();
+		// Hash table to keep track of each vertex's parent (used for building the path)
+		HashTable<Integer, Vertex<SuperPixel>> parent = new HashTable<>();
 
-	    queue.Enqueue(startVertex);
-	    visited.add(startVertex);
-	    parent.put(startVertex.GetElement().getId(), null);
+		// Start BFS by enqueuing the start vertex
+		queue.Enqueue(startVertex);
+		// Mark the start vertex as visited
+		visited.add(startVertex);
+		// Set the start vertex's parent to null (it's the root of the path)
+		parent.put(startVertex.GetElement().getId(), null);
 
-	    while (!queue.isEmpty()) {
-	        Vertex<SuperPixel> current = queue.Dequeue();
+		// Continue BFS while there are vertices to explore
+		while (!queue.isEmpty()) {
+			// Get the next vertex in the queue
+			Vertex<SuperPixel> current = queue.Dequeue();
 
-	        if (current.equals(endVertex)) {
-	            for (Vertex<SuperPixel> node = current; node != null; node = parent.get(node.GetElement().getId())) {
-	                path.add(0, node);   
-	            }
-	            return path;
-	        }
+			// If we've reached the end vertex, build and return the path
+			if (current.equals(endVertex)) {
+				return buildPath(parent, current);
+			}
 
-	        for (Edge<SuperPixel> edge : current.EdgeList()) {
-	            Vertex<SuperPixel> neighbor = edge.getVertFrom().equals(current)
-	                ? edge.getVertTO()
-	                : edge.getVertFrom();
+			// Go through all edges (connections) from the current vertex
+			for (Edge<SuperPixel> edge : current.EdgeList()) {
+				Vertex<SuperPixel> neighbor;
 
-	            if (!visited.contains(neighbor)) {
-	                visited.add(neighbor);
-	                parent.put(neighbor.GetElement().getId(), current);
-	                queue.Enqueue(neighbor);
-	            }
-	        }
-	    }
+				// Determine which vertex is the neighbor (the one not equal to current)
+				if (edge.getVertFrom().equals(current)) {
+					neighbor = edge.getVertTO();
+				} else {
+					neighbor = edge.getVertFrom();
+				}
 
-	    return path;
+				// If we haven't visited this neighbor yet
+				if (!visited.contains(neighbor)) {
+					// Mark it as visited
+					visited.add(neighbor);
+					// Record its parent so we can trace the path later
+					parent.put(neighbor.GetElement().getId(), current);
+					// Add the neighbor to the queue to explore it later
+					queue.Enqueue(neighbor);
+				}
+			}
+		}
+
+		// If no path found, return the empty list
+		return path;
+	}
+
+	// Helper method to build the path from end to start using the parent map
+	private ArrayList<Vertex<SuperPixel>> buildPath(HashTable<Integer, Vertex<SuperPixel>> parent,
+			Vertex<SuperPixel> end) {
+		// List to store the path
+		ArrayList<Vertex<SuperPixel>> path = new ArrayList<>();
+		// Start from the end node
+		Vertex<SuperPixel> node = end;
+
+		// Keep adding each parent node to the front of the path list
+		while (node != null) {
+			path.add(0, node); // Add at the beginning to reverse the path
+			node = parent.get(node.GetElement().getId()); // Move to the parent
+		}
+
+		// Return the complete path from start to end
+		return path;
 	}
 
 	/**
 	 * Method for getting the starting vertex
+	 * 
 	 * @return startVertex
 	 */
 	public Vertex<SuperPixel> getStartVertex() {
 		return startVertex;
 	}
 
-
 	/**
 	 * Method for getting the end vertex
+	 * 
 	 * @return endVertex
 	 */
 	public Vertex<SuperPixel> getEndVertex() {
 		return endVertex;
 	}
-	
-	public GraphADT.ArrayList<Vertex<SuperPixel>> getVertices(){
+
+	public GraphADT.ArrayList<Vertex<SuperPixel>> getVertices() {
 		return this.SuperPixelList;
 	}
- 
+
 	/**
 	 * Function to add superpixels to the adjacency list forming the graph structure
 	 * Takes in a superpixel,places it in a vertex and addds to list
@@ -345,7 +385,7 @@ public class Graph<T> {
 		Edge<SuperPixel> Edgebtween = new Edge<SuperPixel>(a, b);
 
 		// Add edge to both as graph is undirected
-		
+
 		a.AddEdge(Edgebtween);
 		b.AddEdge(Edgebtween);
 		edgecount++;
@@ -393,7 +433,6 @@ public class Graph<T> {
 	 * @param Filename Filename with path of the image to greyscale
 	 * @return GreyScaled image
 	 */
-	
 
 	/**
 	 * Take an image in and locate the borders/edges within it (where a large change
@@ -409,20 +448,65 @@ public class Graph<T> {
 		// 0 otherwise
 
 		boolean[][] DetectedEdges = new boolean[Imgheight][Imgwidth];
-		
 
-		for (int y = 0; y < Imgheight; y++) {
-			for (int x = 0; x < Imgwidth; x++) {
+		// sobel kernels
+		int[][] xkernel = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+		int[][] ykernel = { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
+
+		for (int y = 1; y < Imgheight - 1; y++) {
+			for (int x = 1; x < Imgwidth - 1; x++) {
 				// C,R because it wants x then Y
-				int CPixelIntensity = new Color(img.getRGB(x, y)).getRed(); // greyscale has only intensity so the value
-			
-				if (IsInImage(y, x)) {
-					if(CPixelIntensity<Threshhold) {
-						DetectedEdges[y][x]=true;
+				int pixelX = 0;
+				int pixelY = 0;
+
+				for (int i = -1; i <= 1; i++) {
+					for (int j = -1; j <= 1; j++) {
+						int CPixelIntensity = new Color(img.getRGB(x + j, y + i)).getRed(); // greyscale has only
+																							// intensity so the value
+						pixelX += CPixelIntensity * xkernel[i + 1][j + 1];
+						pixelY += CPixelIntensity * ykernel[i + 1][j + 1];
 					}
+				}
+				int magnitude = (int) Math.sqrt((pixelX * pixelX) + (pixelY * pixelY));
+
+				if (magnitude > Threshhold) {
+					DetectedEdges[y][x] = true;
+
+				} else {
+					DetectedEdges[y][x] = false;
 				}
 			}
 
+		}
+
+		for (int x = 0; x < Imgwidth; x++) {
+			int intesityTop = new Color(img.getRGB(x, 0)).getRed();
+			int intesityBottom = new Color(img.getRGB(x,Imgheight - 1)).getRed();
+			if (intesityTop > Threshhold) {
+
+				continue;
+			}
+			if (intesityBottom > Threshhold) {
+				continue;
+			}
+
+			DetectedEdges[0][x] = true;
+			DetectedEdges[Imgheight - 1][x] = true;
+		}
+		for (int y = 0; y < Imgheight; y++) {
+
+			int intesityLeft = new Color(img.getRGB( 0,y)).getRed();
+			int intesityRight = new Color(img.getRGB(Imgwidth - 1,y)).getRed();
+			if (intesityLeft > Threshhold) {
+
+				continue;
+			}
+			if (intesityRight > Threshhold) {
+				continue;
+			}
+
+			DetectedEdges[y][0] = true;
+			DetectedEdges[y][Imgwidth - 1] = true;
 		}
 
 		return DetectedEdges;
@@ -540,9 +624,9 @@ public class Graph<T> {
 						// Ensure both vertices are'nt null
 						// Add an edge if they arent
 						if (toAddEdgeA != null && toAddEdgeB != null) {
-							
+
 							addEdge(toAddEdgeA, toAddEdgeB);
-							
+
 						}
 
 					}
@@ -622,7 +706,6 @@ public class Graph<T> {
 
 		}
 		SP.CalculateCetroids(); // Calculate the avg X and Y Pos for a SuperPixel
-		
 
 		return SP;
 	}
@@ -648,9 +731,6 @@ public class Graph<T> {
 			BufferedImage img, int[][] spMap) {
 
 		SingleLinkedList<Pixel> ToReturn = new SingleLinkedList<Pixel>();
-
-		
-	
 
 		// loop starts at top left goes to bottom right
 		// going along x for each row
@@ -679,48 +759,8 @@ public class Graph<T> {
 				}
 			}
 		}
-		
+
 		return ToReturn;
 	}
 
-	/**
-	 * Get the pixel intensities of the 8 pixels around pixel youre currently at
-	 * 
-	 * @param img The image you're working with
-	 * @param y   Current Y position
-	 * @param x   Current X position
-	 * @return Array containing the intensities of the surrounding 8 pixels
-	 */
-	private int[] GetAdjacentIntesities(BufferedImage img, int y, int x) {
-
-		int TopLeftIntensity = new Color(img.getRGB(x - 1, y + 1)).getRed();
-		int TopRightIntensity = new Color(img.getRGB(x + 1, y + 1)).getRed();
-		int MiddleLeftIntensity = new Color(img.getRGB(x - 1, y)).getRed();
-		int MiddleRightIntensity = new Color(img.getRGB(x + 1, y)).getRed();
-		int BottomLeftIntensity = new Color(img.getRGB(x - 1, y - 1)).getRed();
-		int BottomRightIntensity = new Color(img.getRGB(x + 1, y - 1)).getRed();
-
-		int[] AdjacentPixels = { TopLeftIntensity, TopRightIntensity, MiddleLeftIntensity, MiddleRightIntensity,
-				BottomLeftIntensity, BottomRightIntensity };
-
-		return AdjacentPixels;
-	}
-
-	/**
-	 * Check to see if at your current position will moving in any of the 8
-	 * directions around you goes out of the "World"
-	 * 
-	 * @param CRow Current Pixel Row
-	 * @param CCol Current Pixel Column
-	 * @return True or false based on if move goes out of world
-	 */
-	private boolean IsInImage(int CRow, int CCol) {
-
-		if (CRow + 1 > this.Imgheight - 1 || CRow - 1 < 0) {
-			return false;
-		} else if (CCol + 1 > this.Imgwidth - 1 || CCol - 1 < 0) {
-			return false;
-		}
-		return true;
-	}
 }
