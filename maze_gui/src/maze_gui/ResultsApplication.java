@@ -13,6 +13,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -82,17 +84,24 @@ public class ResultsApplication{
 				 *  This is called similarity detection, and it helps the game understand the maze better. 
 				 *  The game draws red lines between these similar parts so you can see them clearly.
 				 */
-				Label explain = new Label(
-						" 		* The game shows this maze on the screen, and you can try to solve it. \r\n"
-				+ "				* But the game also has a cool feature: it can analyze the maze to find parts that look similar to each other,\r\n"
-				+ "				* like paths that have the same color or are close together. \r\n"
-				+ "				* This is called similarity detection, and it helps the game understand the maze better. \r\n"
-				+ "				* The game draws red lines between these similar parts so you can see them clearly. :)"
-				);
-				explain.setAlignment(Pos.BASELINE_CENTER);
+				
+				String expText =  
+						" The game shows this maze on the screen, and you can try to solve it. \r\n"
+								+"But the game also has a cool feature: it can analyze the maze to find parts that look similar to each other\r\n"
+								+"like paths that have the same color or are close together. \r\n"
+								+"This is called similarity detection, and it helps the game understand the maze better. \r\n"
+								+"The game draws red lines between these similar parts so you can see them clearly. :) ";
+				Label explain = new Label(expText);
+				
+				explain.setWrapText(true);
 				
 				
-				imageVBox.getChildren().addAll(explain,currentImage);
+				VBox explanation = new VBox(explain);
+				explanation.setAlignment(Pos.TOP_LEFT);
+				explanation.setMaxWidth(500);
+				
+				
+				imageVBox.getChildren().addAll(explanation,currentImage);
 				setButton();
 
 				controlPane.getChildren().addAll(imageVBox,similarityButton);
