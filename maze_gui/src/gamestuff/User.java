@@ -4,11 +4,16 @@ package gamestuff;
 
 public class User {
 	private String name;
+	private int bestindex= 0;
 	private AttemptRecord currentAttempt;
 	private GraphADT.ArrayList<AttemptRecord> attempts = new GraphADT.ArrayList<AttemptRecord>();
 	int currentx = 0;
 	int currenty =0;
 	
+	
+	public AttemptRecord getBest() {
+		return attempts.get(bestindex);
+	}
 	
 	/**
 	 * @return the currentx
@@ -78,16 +83,34 @@ public class User {
 	public void insertAttempt(AttemptRecord attempt) {
 		
 		this.attempts.add(attempt);
+		findBestTime();
 	
 	}
+	
+	public void resetAttempts() {
+		setAttempts(new GraphADT.ArrayList<AttemptRecord>());
+		bestindex =0;
+		currentAttempt = null;
+	}
+	public void findBestTime() {
+		AttemptRecord min = this.attempts.get(0);
+		bestindex = 0;
+		if(this.attempts.size() >1) {
+			for(int i =1;i < this.attempts.size();i++) {
+				if(min.getAttemptReport() >= this.attempts.get(i).getAttemptReport()) {
+					min = this.attempts.get(i);
+					bestindex = i;
+				}
+			}
+		}
+		
+	}
+	
 	
 	public int numberOfAttempts() {
 		return this.attempts.size() + 1;
 	}
 	
-	public AttemptRecord getBest() {
-		return this.attempts.get(0);
-	}
 	
 	public AttemptRecord getWorst() {
 		return this.attempts.get(this.attempts.size() -1);

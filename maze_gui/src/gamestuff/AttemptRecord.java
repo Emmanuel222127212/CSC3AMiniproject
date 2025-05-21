@@ -113,8 +113,7 @@ public class AttemptRecord {
 		
 	}
 	
-	
-	
+
 	public int getAttemptReport() {
 		return performanceTime[HOUR] + performanceTime[MINUTE] + performanceTime[SECOND];
 	}

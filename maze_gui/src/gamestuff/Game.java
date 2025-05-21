@@ -26,7 +26,7 @@ public class Game {
 	private Image currentImage;
 
 	private Image characterImage = new Image("/utilityImg/ujLogo.png");
-
+	private boolean inRound = false;
 	private GraphADT.Graph<SuperPixel> currentGraph;
 	private GraphicsContext gc;
 	private Vertex<SuperPixel> currentVertex;
@@ -80,6 +80,7 @@ public class Game {
 	}
 	
 	public void startRound(TextArea t,Scene s) {
+		inRound = true;
 		AttemptRecord pRecord = new AttemptRecord(player.numberOfAttempts());
 		
 		 player.setCurrentAttempt(pRecord);
@@ -102,14 +103,15 @@ public class Game {
 				this.currentImage = image;
 				this.currentGraph = new GraphADT.Graph<SuperPixel>(i.getPath());
 				System.out.println("graph made");
-			
+				player.resetAttempts();
+				gc.drawImage(image, 0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
 				currentVertex = currentGraph.getStartVertex();
 				int startx = currentGraph.getStartVertex().GetElement().getAvgPixelXPos();
 				int starty = currentGraph.getStartVertex().GetElement().getyAvgPixelYPos();
 				
 				player.setCurrentx(startx);
 				player.setCurrenty(starty);
-				gc.fillRect(startx,starty,10,10);	
+				gc.drawImage(new Image("/utilityImg/location.png"),startx,starty,10,10);	
 	}
 	
 	public GraphADT.Graph<SuperPixel> getgraph(){
@@ -213,6 +215,13 @@ public class Game {
 							//checking if player is done
 						if(playerPath.get(playerPath.size()-1).GetElement().compare(currentGraph.getEndVertex().GetElement()) == 0) {
 							player.getCurrentAttempt().CompleteAttempt();
+							inRound = false;
+							gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
+							gc.drawImage(currentImage, 0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
+							currentVertex = currentGraph.getStartVertex();
+							player.setCurrentx(currentVertex.GetElement().getAvgPixelXPos());
+							player.setCurrenty(currentVertex.GetElement().getyAvgPixelYPos());
+							gc.drawImage(new Image("/utilityImg/location.png"),player.getCurrentx(),player.getCurrenty(),10,10);
 						}
 						
 						
@@ -243,6 +252,19 @@ public class Game {
 		gc.drawImage(characterImage,x, y, 15, 15);
 	}
 	
+	public void reset(TextArea t) {
+		t.clear();
+		
+		t.requestFocus();
+		System.out.println(DisplayAttempts(0));
+		inRound = false;
+		gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
+		currentVertex = currentGraph.getStartVertex();
+		player.setCurrentx(currentVertex.GetElement().getAvgPixelXPos());
+		player.setCurrenty(currentVertex.GetElement().getyAvgPixelYPos());
+		
+	}
+	
 	public void moveInGame(String move, TextArea t,javafx.scene.input.KeyEvent event) {
 		
 		
@@ -254,18 +276,22 @@ public class Game {
 		//	t.appendText("\nkey pressed :  " + event.getCode());
 			gc.setFill(Color.RED);
 			moveToVertex(move);
-		
+			
+			
 			
 			
 		}else if(move.equals("ESCAPE") || move.equals("ENTER") || player.getCurrentAttempt().isComplete()) {
-			player.setCurrentx(0);
-			player.setCurrenty(0);
+			t.clear();
 			player.getCurrentAttempt().endAttempt();
 			player.insertAttempt(player.getCurrentAttempt());
-			t.clear();
 			t.appendText(DisplayAttempts(0));
 			System.out.println(DisplayAttempts(0));
-			
+			currentVertex = currentGraph.getStartVertex();
+			player.setCurrentx(currentVertex.GetElement().getAvgPixelXPos());
+			player.setCurrenty(currentVertex.GetElement().getyAvgPixelYPos());
+			gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
+			gc.drawImage(currentImage, 0,0,gc.getCanvas().getWidth(),gc.getCanvas().getHeight());
+			gc.drawImage(new Image("/utilityImg/location.png"),player.getCurrentx(),player.getCurrenty(),10,10);
 			//attempts.appendText(pRecord);
 			
 
@@ -276,8 +302,10 @@ public class Game {
 	}
 	
 	public void handleKeyPressed(Scene s,javafx.scene.input.KeyEvent event,TextArea t) {
+	if(inRound) {
 		String move = event.getCode().toString();
 		moveInGame(move, t, event);
+	}
 	
 	}
 	

@@ -52,7 +52,7 @@ public class SimilarityDetector
         double distance = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
         double spatialSimilarity = Math.max(0, 1 - distance / maxDistance);
 
-        return 0.7 * colorSimilarity + 0.3 * spatialSimilarity;
+        return 0.5 * colorSimilarity + 0.5 * spatialSimilarity;
     }
 
 /*
