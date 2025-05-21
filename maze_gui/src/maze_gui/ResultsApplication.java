@@ -31,8 +31,6 @@ public class ResultsApplication{
 	public ResultsApplication(Image I) {
 		
 		        currentImage = new ImageView(I);
-		
-		        System.out.println("Error: Image is null!");
 		  
 
 		mazeProcessor =  new MazeProcessor(currentImage);
