@@ -72,11 +72,12 @@ public class gui_main extends Application{
 		mainScene.getStylesheets().add("/styles/try.css");
 		
 		VBox start = new VBox();
-		TextArea name =new TextArea();
+		TextArea name =new TextArea("Enter Your Name");
 		name.setMaxHeight(10);
 		Scene startScene = new Scene(start);
 
 		startScene.getStylesheets().add("/styles/try.css");
+		mainScene.getStylesheets().add("/styles/menu.css");
 
 		//Start button
 
@@ -88,18 +89,14 @@ public class gui_main extends Application{
 			//System.out.println(game.getplayerName());
 			arg0.setTitle("Maze Congiitive Tester for :" + name.getText());
 			arg0.setScene(mainScene);});
-		
-		
+			
 		start.getChildren().addAll(name,swtiButton);
 		arg0.setTitle("Maze Congiitive Tester");
 		arg0.setScene(startScene);
-		arg0.show();
-		
+		arg0.show();	
 	}
 	
 	public static void main(String[] args) {
-		
-
 
 		launch(args);
 	}

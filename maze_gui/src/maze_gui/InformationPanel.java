@@ -1,8 +1,17 @@
 package maze_gui;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import PathFinding.PathFinder;
 import gamestuff.AttemptRecord;
 import gamestuff.Game;
+import image_preprocessing.ImagePreProcessor;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -38,6 +47,7 @@ public class InformationPanel extends VBox{
 	private Button attemptButton = new Button("attempt");
 	private Button resetButton = new Button("reset");
 	private Button resultButton = new Button("results");
+	private Button revealButton = new Button("reveal");
 	private VBox menuBox = new VBox();
 	private Canvas canvas;
 	private GraphicsContext gc;
@@ -53,6 +63,7 @@ public class InformationPanel extends VBox{
 		setStyleAllign(menuBox);
 		setButtonVisibility(true, false);
 		setAllButtonStyles();
+		revealButton.setDisable(true);
 	}
 	
 	
@@ -60,9 +71,11 @@ public class InformationPanel extends VBox{
 		attemptButton.setDisable(disable);
 		resetButton.setDisable(disable);
 		resultButton.setDisable(disable);
+		 
 		
 		attemptButton.setVisible(visible);
 		resetButton.setVisible(visible);
+		revealButton.setVisible(visible);
 		resultButton.setVisible(visible);
 	}
 	
@@ -73,6 +86,7 @@ public class InformationPanel extends VBox{
 		setButtonStyle(attemptButton);
 		setButtonStyle(resetButton);
 		setButtonStyle(resultButton);
+		setButtonStyle(revealButton);
 	}
 	
 	private void setButtonStyle( Button btn) {
@@ -112,7 +126,7 @@ public class InformationPanel extends VBox{
 					changeProgress();
 					game.startRound(attempts,s);
 					
-					
+					revealButton.setDisable(false);
 				});
 	}
 	
@@ -121,11 +135,13 @@ public class InformationPanel extends VBox{
 		
 	}
 	
-	private void setMenuBox(){
-		this.menuBox.getChildren().addAll(name,menu,attemptProgress);
-		this.menuBox.setPadding( new Insets(5,5,5,5));
+	private void setMenuBox() {
+	    this.menuBox.getChildren().addAll(name, menu, attemptProgress);
+	    this.menuBox.setPadding(new Insets(5, 5, 5, 5));
+	    
+	    // Apply CSS class
+	    menuBox.getStyleClass().add("menu-box");
 	}
-	
 	
 	public void SelectImage(Pane s) {
 		//select image button
@@ -138,10 +154,33 @@ public class InformationPanel extends VBox{
 					
 					 currentFile = pickFile.showOpenDialog(stage);
 					
-					if(currentFile != null && currentFile.getAbsolutePath().endsWith(".png")) {
-						Image image = new Image(currentFile.toURI().toString());
+					if(currentFile != null && (currentFile.getAbsolutePath().endsWith(".png") || currentFile.getAbsolutePath().endsWith(".jpg")))
+					{
+
+						 
+						Image image = null;
+						try {
+							ImagePreProcessor processor = new ImagePreProcessor(currentFile.getAbsolutePath());
+
+						    BufferedImage processedImage = processor.getProcessedImage();  // Trims + grayscale
+
+						    // Convert BufferedImage to JavaFX Image
+						    ByteArrayOutputStream out = new ByteArrayOutputStream();
+						    ImageIO.write(processedImage, "png", out);
+						    ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+						    image = new Image(in);
+
+						    System.out.println("Image processed and converted to JavaFX Image.");
+
+						} catch (IOException ex) {
+						    ex.printStackTrace();
+						}
 						
 						System.out.println("image set");	
+						//Find The Path Of The Image Selected
+						PathFinder pathFinder = new PathFinder("data/"+currentFile.getName());
+						pathFinder.findPath();
+						
 						canvas = new Canvas(image.getWidth(),image.getHeight());
 						s.getChildren().add(canvas);
 						gc = canvas.getGraphicsContext2D();
@@ -151,32 +190,46 @@ public class InformationPanel extends VBox{
 							
 							setButtonVisibility(false, true);
 						
-					}else {
+					}
+					else {
 						
 						System.err.println("file type not image or not found");
 					}
+							
+					
 				});
 	}
 	private void setButtons() {
 		//reset button
 		setResults();
-		
+		setReveal();
 		
 	}
 	
 	
 	public void setResults() {
-resetButton.setOnAction(e -> {
-			
+		resetButton.setOnAction(e -> {
+
 		});
-		
+
 		//result button 
 		resultButton.setOnAction(e -> {
 			//Image imageView = new Image(new File("./Data/946.png").toURI().toString());
 			ResultsApplication resultsApplication = new ResultsApplication(currentFile);
-			
-				resultsApplication.startWin();
-			
+
+			resultsApplication.startWin();
+
+		});
+	}
+	
+	public void setReveal()
+	{
+		revealButton.setOnAction(e -> {
+			//Image imageView = new Image(new File("./Data/946.png").toURI().toString());
+			revealApplication resultsApplication = new revealApplication(currentFile);
+
+			resultsApplication.startWin();
+
 		});
 	}
 
@@ -198,7 +251,7 @@ resetButton.setOnAction(e -> {
 		setTextArea();
 		setMenuBox();
 
-		getChildren().addAll(menuBox,attempts,selectButton,attemptButton,resetButton,resultButton);
+		getChildren().addAll(menuBox,attempts,selectButton,attemptButton,resetButton,resultButton,revealButton);
 	}
 	
 }
