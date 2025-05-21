@@ -10,7 +10,7 @@
 }
 
 .menu-box .label {
-    -fx-font-size: 18px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-text-fill: #2d2d2d;
     -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.7), 4, 0, 0, 1);

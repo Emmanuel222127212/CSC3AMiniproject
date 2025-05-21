@@ -72,7 +72,7 @@ public class gui_main extends Application{
 		mainScene.getStylesheets().add("/styles/try.css");
 		
 		VBox start = new VBox();
-		TextArea name =new TextArea();
+		TextArea name =new TextArea("Enter Your Name");
 		name.setMaxHeight(10);
 		Scene startScene = new Scene(start);
 
