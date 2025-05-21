@@ -1,33 +1,26 @@
 package GraphADT;
 
-import GraphADT.SimilarityDetector;
-
-import GraphADT.SuperPixel;
-import GraphADT.Pixel;
-import GraphADT.ArrayList;
 import java.awt.image.BufferedImage;
-//import java.util.ArrayList;
-import javax.imageio.ImageIO;
-import java.awt.*;
 import java.io.File;
+import javax.imageio.ImageIO;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import java.awt.*;
+import java.util.List;
 
 public class MazeProcessor {
     private BufferedImage mazeImage;
     private int width, height;
-    
- //   private ArrayList<SuperPixel> superPixelList;
-    
-    private ArrayList<SuperPixel> userPX;
-    private ArrayList<SuperPixel> systemPx;
-    
-    private SimilarityDetector similarityDetector;
-    private ImageView imageView; // To update the displayed image
+    private Graph<SuperPixel> graph;
+    private ArrayList<Vertex<SuperPixel>> userPath;
+    private ArrayList<Vertex<SuperPixel>> systemPath;
+    private ImageView imageView;
 
     public MazeProcessor(ImageView imageView) {
         this.imageView = imageView;
+        this.userPath = new ArrayList<>();
+        this.systemPath = new ArrayList<>();
     }
 
     public void processMazeImage(String imagePath) {
@@ -37,137 +30,144 @@ public class MazeProcessor {
                 System.out.println("Maze image not found: " + imagePath);
                 return;
             }
+            System.out.println("Processing image: " + imagePath);
             mazeImage = ImageIO.read(file);
+            if (mazeImage == null) {
+                System.out.println("Failed to load image: " + imagePath);
+                return;
+            }
             width = mazeImage.getWidth();
             height = mazeImage.getHeight();
+            System.out.println("Image loaded: " + width + "x" + height);
 
-            // Segment into superpixels
-            segmentSuperpixels();
+            // Initialize graph
+            graph = new Graph<>(imagePath);
+            System.out.println("Graph initialized with " + graph.getVertices().size() + " vertices");
+
+            // Get system path
+            systemPath = graph.findPath();
+            if (systemPath.isEmpty()) {
+                System.out.println("No system path found. Check start/end vertices.");
+                System.out.println("Start vertex: " + (graph.getStartVertex() != null ? graph.getStartVertex().GetElement().getId() : "null"));
+                System.out.println("End vertex: " + (graph.getEndVertex() != null ? graph.getEndVertex().GetElement().getId() : "null"));
+                return;
+            }
+            systemPath = graph.simplifyPath(systemPath);
+            System.out.println("System path vertices: " + systemPath.size());
+
+            // Segment user path
+            segmentUserPath();
+            System.out.println("User path vertices: " + userPath.size());
+
+            // Compute similarities and visualize
             computeSimilaritiesAndVisualize();
             saveVisualizedImage(imagePath);
             displayProcessedImage();
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Error processing maze image: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void segmentSuperpixels() 
-    {
-    	//changes here
-        userPX = new ArrayList<>();
-        systemPx = new ArrayList<>();
-        
+    private void segmentUserPath() {
+        userPath = new ArrayList<>();
+        boolean[][] visited = new boolean[height][width];
         int gridSize = 5;
 
-        for (int row = 0; row < height; row += gridSize)
-        {
-            for (int col = 0; col < width; col += gridSize) 
-            {
-            	
+        for (int row = 0; row < height; row += gridSize) {
+            for (int col = 0; col < width; col += gridSize) {
                 SuperPixel userSp = new SuperPixel();
-                SuperPixel systemSp = new SuperPixel();
-                
-                //boolean hasPath = false;
-                
-                for (int r = row; r < row + gridSize && r < height; r++)
-                {
-                    for (int c = col; c < col + gridSize && c < width; c++) 
-                    {
+                for (int r = row; r < row + gridSize && r < height; r++) {
+                    for (int c = col; c < col + gridSize && c < width; c++) {
+                        if (visited[r][c]) continue;
                         int rgb = mazeImage.getRGB(c, r);
-                        int gValue = (rgb >> 8) & 0xff;
                         int bValue = rgb & 0xff;
-                        
-                        if (gValue > 200) 
-                        { //System path
-                            systemSp.AddPixel(new Pixel(c, r, gValue)); // Use green channel for intensity
-                           // hasPath = true;
-                            
-                        }
-                        //user path
-                        if(bValue > 200)
-                        {
-                        	userSp.AddPixel(new Pixel(c,r,bValue));
+                        if (bValue > 150) { // Lowered threshold for user path
+                            userSp.AddPixel(new Pixel(c, r, bValue));
+                            visited[r][c] = true;
                         }
                     }
                 }
-                
-                
-                //changed here
-                if(systemSp.getAllPixels().size()>0)
-                {
-                	systemSp.CalculateCetroids();
-                	if(systemSp.GetType() == 1)
-                	{
-                		systemPx.add(systemSp);
-                	}
-                } 
-                
-                if(userSp.getAllPixels().size()>0)
-                {
-                	userSp.CalculateCetroids();
-                	if(systemSp.GetType() == 1)
-                	{
-                		userPX.add(userSp);
-                	}
-                } 
-              /*  if (hasPath)
-               *  {
-                    sp.CalculateCetroids(); // Sets centroids and type
-                    if (sp.GetType() == 1) { // Only add path superpixels (type 1)
-                        superPixelList.add(sp);
+                if (userSp.getAllPixels().size() > 0) {
+                    userSp.CalculateCetroids();
+                    if (userSp.GetType() == 1) {
+                        Vertex<SuperPixel> vertex = findVertexForSuperPixel(userSp);
+                        if (vertex != null) {
+                            userPath.add(vertex);
+                        }
                     }
-                }*/
+                }
             }
         }
-        similarityDetector = new SimilarityDetector(userPX,systemPx, mazeImage);
-        System.out.println("Generated " + userPX.size() + " user pixels and " + systemPx.size() + " System superPixels");
+        System.out.println("Segmented user path with " + userPath.size() + " vertices");
     }
 
-    private void computeSimilaritiesAndVisualize() 
-    {
+    private Vertex<SuperPixel> findVertexForSuperPixel(SuperPixel sp) {
+        for (Vertex<SuperPixel> vertex : graph.getVertices()) {
+            SuperPixel vertexSp = vertex.GetElement();
+            for (Pixel p : sp.getAllPixels()) {
+                if (vertexSp.getAllPixels().contains(p)) {
+                    return vertex;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void computeSimilaritiesAndVisualize() {
+    	
+        if (userPath.isEmpty() || systemPath.isEmpty()) {
+            System.out.println("Cannot compute similarities: userPath or systemPath is empty");
+            mazeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2d = mazeImage.createGraphics();
+            g2d.setColor(Color.WHITE);
+            g2d.fillRect(0, 0, width, height);
+            g2d.dispose();
+            return;
+        }
+
         BufferedImage visualization = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = visualization.createGraphics();
-        
         g2d.drawImage(mazeImage, 0, 0, null);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setColor(Color.RED);
         g2d.setStroke(new BasicStroke(1));
 
-        int similarPairs = 0;
-        
-        for (int UID = 0; UID < userPX.size(); UID++) 
-       {
-            for (int SID = 0; SID < systemPx.size(); SID++) 
-            
-            {
-                double similarity = similarityDetector.computeSimilarity(UID, SID);
-                
-                if (similarity > 0.80) 
-                {
-                    similarPairs++;
-                    SuperPixel sp1 = userPX.get(UID);
-                    SuperPixel sp2 = systemPx.get(SID);
-                    
-                    int x1 = sp1.getAvgPixelXPos();
-                    int y1 = sp1.getyAvgPixelYPos();
-                    int x2 = sp2.getAvgPixelXPos();
-                    int y2 = sp2.getyAvgPixelYPos();
-                    
-                    g2d.drawLine(x1, y1, x2, y2);
-                    System.out.println("Similar pair(User) " + UID + " and " + SID + " (Similarity: " + String.format("%.3f", similarity) + ")");
-                }
-            }
+        SimilarityDetector detector = new SimilarityDetector(userPath, systemPath, mazeImage);
+        ArrayList<Vertex<SuperPixel>[]> matchedPairs = detector.findMostSimilarPairs(0.6); // Lowered threshold
+        System.out.println("Matched pairs found: " + matchedPairs.size());
+
+        for (Vertex<SuperPixel>[] pair : matchedPairs) {
+            SuperPixel sp1 = pair[0].GetElement();
+            SuperPixel sp2 = pair[1].GetElement();
+            int x1 = sp1.getAvgPixelXPos();
+            int y1 = sp1.getyAvgPixelYPos();
+            int x2 = sp2.getAvgPixelXPos();
+            int y2 = sp2.getyAvgPixelYPos();
+            g2d.drawLine(x1, y1, x2, y2);
+            System.out.println("Drawing line from (" + x1 + "," + y1 + ") to (" + x2 + "," + y2 + ")");
         }
         g2d.dispose();
         mazeImage = visualization;
-        System.out.println("Found " + similarPairs + " similar superpixel pairs (similarity > 0.95)");
     }
 
     private void saveVisualizedImage(String inputPath) {
         try {
             String outputPath = inputPath.replaceFirst("(\\.[^.]+)$", "_similarity$1");
             File outputFile = new File(outputPath);
+            System.out.println("Attempting to save to: " + outputPath);
+            if (!outputFile.getParentFile().exists()) {
+                outputFile.getParentFile().mkdirs();
+                System.out.println("Created directory: " + outputFile.getParentFile().getAbsolutePath());
+            }
+            if (!outputFile.getParentFile().canWrite()) {
+                System.out.println("Cannot write to directory: " + outputFile.getParentFile().getAbsolutePath());
+                return;
+            }
+            if (mazeImage == null) {
+                System.out.println("Error: mazeImage is null, cannot save.");
+                return;
+            }
             ImageIO.write(mazeImage, "png", outputFile);
             System.out.println("Similarity visualization saved as: " + outputPath);
         } catch (Exception e) {
@@ -177,31 +177,24 @@ public class MazeProcessor {
     }
 
     private void displayProcessedImage() {
+        if (mazeImage == null) {
+            System.out.println("Error: mazeImage is null, cannot display.");
+            return;
+        }
         Image fxImage = SwingFXUtils.toFXImage(mazeImage, null);
         imageView.setImage(fxImage);
+        System.out.println("Processed image displayed.");
     }
 
-  //getters for the new user and System Super pixel lists
-	public ArrayList<SuperPixel> getUserPX() 
-	{
-		return userPX;
-	}
+    public ArrayList<Vertex<SuperPixel>> getUserPath() {
+        return userPath;
+    }
 
-	public ArrayList<SuperPixel> getSystemPx() 
-	{
-		return systemPx;
-	}
+    public ArrayList<Vertex<SuperPixel>> getSystemPath() {
+        return systemPath;
+    }
 
-	
-	public BufferedImage getBufferedImage() 
-	{
-		
-		return mazeImage;
-	}
-    
-    
-    
-    
-    
-    
+    public BufferedImage getBufferedImage() {
+        return mazeImage;
+    }
 }
