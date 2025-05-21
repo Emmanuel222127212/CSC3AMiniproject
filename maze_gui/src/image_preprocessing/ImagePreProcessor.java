@@ -27,130 +27,136 @@ public class ImagePreProcessor {
 	
 	private BufferedImage GreyScaleImage(String Filename) {
 
-		try {
-			File file = new File(Filename);
-			System.out.println("Trying to read: " + file.getAbsolutePath());
-			System.out.println("Exists? " + file.exists());
-			BufferedImage ColourImage = ImageIO.read(file);
+	    try {
+	        File file = new File(Filename);
+	        System.out.println("Trying to read: " + file.getAbsolutePath());
+	        System.out.println("Exists? " + file.exists());
 
-			BufferedImage GreyScale = new BufferedImage(ColourImage.getWidth(), ColourImage.getHeight(),
-					BufferedImage.TYPE_BYTE_GRAY);
+	        BufferedImage ColourImage = ImageIO.read(file);
 
-			imgTrimming(GreyScale);
-			Graphics DrawGrey = GreyScale.getGraphics();
+	        BufferedImage GreyScale = new BufferedImage(ColourImage.getWidth(), ColourImage.getHeight(),
+	                BufferedImage.TYPE_BYTE_GRAY);
 
-			DrawGrey.drawImage(ColourImage, 0, 0, null);
+	        Graphics DrawGrey = GreyScale.getGraphics();
+	        DrawGrey.drawImage(ColourImage, 0, 0, null);
+	        DrawGrey.dispose();
+	        
+	        BufferedImage trimmedImg = imgTrimming(GreyScale);
+ 
+	        File output = new File("Converted/GreyImage.png");
+	        output.getParentFile().mkdirs();
+	        ImageIO.write(trimmedImg, "png", output);
 
-			DrawGrey.dispose();
+	        return trimmedImg;
 
-			File output = new File("Converted/GreyImage.png");
-			output.getParentFile().mkdirs();
-			
-			
-			ImageIO.write(GreyScale, "png", output);
-
-			
-			return GreyScale;
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+	    } catch (IOException e)
+	    {
+	        e.printStackTrace();
+	    }
+	    return null;
 	}
-	private void imgTrimming(BufferedImage img) {
-		int height=img.getHeight();
-		int width = img.getWidth();
+	private BufferedImage imgTrimming(BufferedImage img) 
+	{
 		
-		int top=0;
-		int bottom=height-1;
-		int left = 0;
-		int right=width-1;
-		boolean DetectedWall=false;
-		//top
-		for (int r = 0; r < height-1; r++) {
-			for(int c=0;c<width-1;c++) {
-				
-				if(DetectedWall) {
-					DetectedWall=false;
-					break;
-				}
-				int rgbIntensity=new Color(img.getRGB(r, c)).getRed(); //image greyscaled so this just gets intensity
-				
-				//wall found
-				if(rgbIntensity==0) {
-					top=r;
-					DetectedWall=true;
-					break;
-				}
-			}
-			
-		}
-		//bottom
-		for (int r = height-1; r>0; r--) {
-			for(int c=0;c<width-1;c++) {
-				
-				if(DetectedWall) {
-					DetectedWall=false;
-					break;
-				}
-				
-				int rgbIntensity=new Color(img.getRGB(r, c)).getRed(); //image greyscaled so this just gets intensity
-				
-				//wall found
-				if(rgbIntensity==0) {
-					bottom=r;
-					DetectedWall=true;
-					break;
-					
-				}
-			}
-			
-		}
-		
-		//left
-		for(int c=0;c<width-1;c++) {
-			for (int r = 0; r < height-1; r++) {
-				if(DetectedWall) {
-					DetectedWall=false;
-					break;
-				}
-				
-				int rgbIntensity=new Color(img.getRGB(r, c)).getRed(); //image greyscaled so this just gets intensity
-				
-				//wall found
-				if(rgbIntensity==0) {
-					left=c;
-					DetectedWall=true;
-					break;
-				}
-			}
-		}
-		
-		//Right
-		for(int c=width-1;c>0;c--) {
-			for (int r = 0; r < height-1; r++) {
-				if(DetectedWall) {
-					DetectedWall=false;
-					break;
-				}
-				
-				int rgbIntensity=new Color(img.getRGB(r, c)).getRed(); //image greyscaled so this just gets intensity
-				
-				//wall found
-				if(rgbIntensity==0) {
-					right=c;
-					DetectedWall=true;
-					break;
-				}
-			}
-		}
-		
-		img=img.getSubimage(left, top, right, bottom);
-		
-		
+	    int height = img.getHeight();
+	    int width = img.getWidth();
+
+	    int top = 0;
+	    int bottom = height - 1;
+	    int left = 0;
+	    int right = width - 1;
+
+	    boolean detectedWall = false;
+
+	    // Top
+	    for (int r = 0; r < height; r++)
+	    {
+	        for (int c = 0; c < width; c++) 
+	        {
+	            int rgbIntensity = new Color(img.getRGB(c, r)).getRed();  
+	            
+	            if (rgbIntensity == 0) {
+	            	
+	                top = r;
+	                detectedWall = true;
+	                
+	                break;
+	            }
+	        }
+	        if (detectedWall) 
+	        	{
+	        	break;
+	        	}
+	    }
+
+	    detectedWall = false;
+
+	    // Bottom
+	    for (int r = height - 1; r >= 0; r--) 
+	    {
+	        for (int c = 0; c < width; c++) 
+	        {
+	            int rgbIntensity = new Color(img.getRGB(c, r)).getRed();
+	            if (rgbIntensity == 0) {
+	                bottom = r;
+	                detectedWall = true;
+	                break;
+	            }
+	        }
+	        if (detectedWall) break;
+	    }
+
+	    detectedWall = false;
+
+	    // Left
+	    for (int c = 0; c < width; c++) 
+	    {
+	        for (int r = 0; r < height; r++) 
+	        {
+	            int rgbIntensity = new Color(img.getRGB(c, r)).getRed();
+	            
+	            if (rgbIntensity == 0) 
+	            {
+	                left = c;
+	                detectedWall = true;
+	                break;
+	            }
+	        }
+	        if (detectedWall) {
+	        	break;
+	        }
+	    }
+
+	    detectedWall = false;
+
+	    // Right
+	    for (int c = width - 1; c >= 0; c--) 
+	    {
+	        for (int r = 0; r < height; r++) 
+	        {
+	            int rgbIntensity = new Color(img.getRGB(c, r)).getRed();
+	            if (rgbIntensity == 0) {
+	                right = c;
+	                detectedWall = true;
+	                break;
+	            }
+	        }
+	        if (detectedWall) break;
+	    }
+
+	    // Calculate the trimmed width and height
+	    int trimmedWidth = right - left + 1;
+	    int trimmedHeight = bottom - top + 1;
+
+	    // Validate the bounds
+	    if (trimmedWidth <= 0 || trimmedHeight <= 0 ||
+	        left < 0 || top < 0 ||
+	        left + trimmedWidth > width || top + trimmedHeight > height) {
+	        throw new IllegalArgumentException("Calculated trimming bounds are invalid.");
+	    }
+
+	    // Return trimmed image
+	    return img.getSubimage(left, top, trimmedWidth, trimmedHeight);
 	}
-	
-	
 	 
 }
