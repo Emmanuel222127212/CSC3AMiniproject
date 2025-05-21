@@ -65,15 +65,14 @@ public class InformationPanel extends VBox{
 		setButtonVisibility(true, false);
 		setAllButtonStyles();
 		revealButton.setDisable(true);
+		resetButton.setDisable(true);
+		resultButton.setDisable(true);
 	}
 	
 	
 	private void setButtonVisibility(boolean disable, boolean visible) {
 		attemptButton.setDisable(disable);
-		resetButton.setDisable(disable);
-		resultButton.setDisable(disable);
-		 
-		
+	
 		attemptButton.setVisible(visible);
 		resetButton.setVisible(visible);
 		revealButton.setVisible(visible);
@@ -128,6 +127,8 @@ public class InformationPanel extends VBox{
 					game.startRound(attempts,s);
 					
 					revealButton.setDisable(false);
+					resetButton.setDisable(false);
+					resultButton.setDisable(false);
 				});
 	}
 	
@@ -222,7 +223,11 @@ public class InformationPanel extends VBox{
 	
 	public void setResults() {
 		resetButton.setOnAction(e -> {
-			game.reset(attempts);
+			if(game.getplayerRecords() != null) {
+				game.reset(attempts);
+			}else {
+				
+			}
 		});
 
 		//result button 
