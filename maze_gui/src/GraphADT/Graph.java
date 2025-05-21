@@ -260,54 +260,83 @@ public class Graph<T> {
 	    return simple; 
 	}
 
-	
-	/**
-	 * Finds a path from the start SuperPixel to the end SuperPixel using breadth-first search (BFS).
-	 * The method looks for the shortest path by checking all possible paths, step by step.
-	 * It returns the first path that reaches the end SuperPixel.
-	 * @return A list of SuperPixel vertices that form the path from start to end.
-	 *         If no path is found or start/end is missing, returns an empty list.
-	 */
 	public ArrayList<Vertex<SuperPixel>> findPath() {
+	    // Create a list to store the final path from start to end
 	    ArrayList<Vertex<SuperPixel>> path = new ArrayList<>();
 
+	    // If either start or end is missing, return an empty path
 	    if (startVertex == null || endVertex == null) {
 	        return path;
 	    }
 
+	    // Queue for BFS (to explore nodes level by level)
 	    LinkedQueue<Vertex<SuperPixel>> queue = new LinkedQueue<>();
+	    // List to keep track of visited vertices
 	    ArrayList<Vertex<SuperPixel>> visited = new ArrayList<>();
+	    // Hash table to keep track of each vertex's parent (used for building the path)
 	    HashTable<Integer, Vertex<SuperPixel>> parent = new HashTable<>();
 
+	    // Start BFS by enqueuing the start vertex
 	    queue.Enqueue(startVertex);
+	    // Mark the start vertex as visited
 	    visited.add(startVertex);
+	    // Set the start vertex's parent to null (it's the root of the path)
 	    parent.put(startVertex.GetElement().getId(), null);
 
+	    // Continue BFS while there are vertices to explore
 	    while (!queue.isEmpty()) {
+	        // Get the next vertex in the queue
 	        Vertex<SuperPixel> current = queue.Dequeue();
 
+	        // If we've reached the end vertex, build and return the path
 	        if (current.equals(endVertex)) {
-	            for (Vertex<SuperPixel> node = current; node != null; node = parent.get(node.GetElement().getId())) {
-	                path.add(0, node);   
-	            }
-	            return path;
+	            return buildPath(parent, current);
 	        }
 
+	        // Go through all edges (connections) from the current vertex
 	        for (Edge<SuperPixel> edge : current.EdgeList()) {
-	            Vertex<SuperPixel> neighbor = edge.getVertFrom().equals(current)
-	                ? edge.getVertTO()
-	                : edge.getVertFrom();
+	            Vertex<SuperPixel> neighbor;
 
+	            // Determine which vertex is the neighbor (the one not equal to current)
+	            if (edge.getVertFrom().equals(current)) {
+	                neighbor = edge.getVertTO();
+	            } else {
+	                neighbor = edge.getVertFrom();
+	            }
+
+	            // If we haven't visited this neighbor yet
 	            if (!visited.contains(neighbor)) {
+	                // Mark it as visited
 	                visited.add(neighbor);
+	                // Record its parent so we can trace the path later
 	                parent.put(neighbor.GetElement().getId(), current);
+	                // Add the neighbor to the queue to explore it later
 	                queue.Enqueue(neighbor);
 	            }
 	        }
 	    }
 
+	    // If no path found, return the empty list
 	    return path;
 	}
+
+	// Helper method to build the path from end to start using the parent map
+	private ArrayList<Vertex<SuperPixel>> buildPath(HashTable<Integer, Vertex<SuperPixel>> parent, Vertex<SuperPixel> end) {
+	    // List to store the path
+	    ArrayList<Vertex<SuperPixel>> path = new ArrayList<>();
+	    // Start from the end node
+	    Vertex<SuperPixel> node = end;
+
+	    // Keep adding each parent node to the front of the path list
+	    while (node != null) {
+	        path.add(0, node); // Add at the beginning to reverse the path
+	        node = parent.get(node.GetElement().getId()); // Move to the parent
+	    }
+
+	    // Return the complete path from start to end
+	    return path;
+	}
+
 
 	/**
 	 * Method for getting the starting vertex

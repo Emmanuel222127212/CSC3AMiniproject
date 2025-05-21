@@ -89,13 +89,11 @@ public class gui_main extends Application{
 			//System.out.println(game.getplayerName());
 			arg0.setTitle("Maze Congiitive Tester for :" + name.getText());
 			arg0.setScene(mainScene);});
-		
-		
+			
 		start.getChildren().addAll(name,swtiButton);
 		arg0.setTitle("Maze Congiitive Tester");
 		arg0.setScene(startScene);
-		arg0.show();
-		
+		arg0.show();	
 	}
 	
 	public static void main(String[] args) {
