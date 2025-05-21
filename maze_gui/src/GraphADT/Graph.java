@@ -3,6 +3,7 @@ package GraphADT;
 import image_preprocessing.*;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -109,7 +110,7 @@ public class Graph<T> {
 				g.setColor(Color.blue);
 				g.drawLine(fromX, fromY, toX, toY);
 
-				System.err.println(edge.getWeight());
+				 
 			}
 
 		}
@@ -118,9 +119,9 @@ public class Graph<T> {
 
 		// Save final image
 		try {
-			System.out.println("makeing image for " + FileName);
+		 
 			ImageIO.write(edgeOverlay, "png", new File("Output_maze.png"));
-			System.out.println("Image made");
+		 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -130,40 +131,98 @@ public class Graph<T> {
 		// each vertex and edge
 
 
-		findStartAndEnd();
+		findStartAndEndFromEdges(ReadGrey);
 	}
 
-	/**
-	 * Finds and sets the start and end SuperPixels based on their Pixel positions.
-	 * The start SuperPixel is the first one found that has a Pixel at the left edge (x = 0).  
-	 * The end SuperPixel is the first one found that has a Pixel at the right edge (x = Imgwidth - 1).
-	 * Once both are found, the method stops searching.
-	 */
-	public void findStartAndEnd() {
-	    // Goes through every SuperPixel in the list
-	    for (Vertex<SuperPixel> v : SuperPixelList) {
-	        // Goes through every Pixel in the current SuperPixel
-	        for (Pixel p : v.GetElement().getAllPixels()) {
-	            
-	            // Checks if this Pixel is on the left edge of the image
-	            if (startVertex == null && p.getXPos() == 0) {
-	                startVertex = v; // Set this SuperPixel as the start
-	            }
-
-	            // Checks if this Pixel is on the right edge of the image
-	            if (endVertex == null && p.getXPos() == Imgwidth - 1) {
-	                endVertex = v; // Set this SuperPixel as the end
-	            }
-
-	            // If both start and end are found, stop searching
-	            if (startVertex != null && endVertex != null) {
-	                return;
-	            }
-	        }
-	    }
+	// Returns a rectangle bounding the maze based on border pixels.
+	private Rectangle getMazeBounds(BufferedImage image) {
+		int width = image.getWidth();
+		int height = image.getHeight();
+		int top = height, bottom = 0, left = width, right = 0;
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				int rgb = image.getRGB(x, y) & 0xFF;
+				if (rgb < 100) { // Consider dark pixels as walls.
+					if (x < left) left = x;
+					if (x > right) right = x;
+					if (y < top) top = y;
+					if (y > bottom) bottom = y;
+				}
+			}
+		}
+		if (left > right || top > bottom) {
+			// Fallback to full image bounds.
+			return new Rectangle(0, 0, image.getWidth(), image.getHeight());
+		}
+		return new Rectangle(left, top, right - left + 1, bottom - top + 1);
 	}
 
+	// Finds start and end vertices by scanning the perimeter of the maze.
+	public void findStartAndEndFromEdges(BufferedImage image) {
+		 
+		Rectangle mazeBounds = getMazeBounds(image);
+		int left = mazeBounds.x;
+		int right = left + mazeBounds.width - 1;
+		int top = mazeBounds.y;
+		int bottom = top + mazeBounds.height - 1;
 
+		 
+		// Search top edge for start vertex.
+		for (int x = left; x <= right; x++) {
+			if (isPathPixel(image.getRGB(x, top))) {
+				startVertex = findSuperPixelAt(x, top);
+				break;
+			}
+		}
+		// Search bottom edge for end vertex.
+		for (int x = left; x <= right; x++) {
+			if (isPathPixel(image.getRGB(x, bottom))) {
+				if (endVertex == null) {
+					endVertex = findSuperPixelAt(x, bottom);
+					break;
+				}
+			}
+		}
+		// If start not found, search left edge.
+		if (startVertex == null) {
+			for (int y = top; y <= bottom; y++) {
+				if (isPathPixel(image.getRGB(left, y))) {
+					startVertex = findSuperPixelAt(left, y);
+					break;
+				}
+			}
+		}
+		// If end not found, search right edge.
+		if (endVertex == null) {
+			for (int y = top; y <= bottom; y++) {
+				if (isPathPixel(image.getRGB(right, y))) {
+					endVertex = findSuperPixelAt(right, y);
+					break;
+				}
+			}
+		}
+	}
+
+	// Returns the vertex containing the pixel at (x, y)
+	private Vertex<SuperPixel> findSuperPixelAt(int x, int y) {
+		for (Vertex<SuperPixel> v : SuperPixelList) {
+			for (Pixel p : v.GetElement().getAllPixels()) {
+				if (p.getXPos() == x && p.getYPos() == y) {
+					return v;
+				}
+			}
+		}
+		return null;
+	}
+
+	private boolean isPathPixel(int rgb) {
+		int red = (rgb >> 16) & 0xFF;
+		int green = (rgb >> 8) & 0xFF;
+		int blue = rgb & 0xFF;
+
+		int average = (red + green + blue) / 3;
+		return average > 200;
+	}
 
 	/**
 	 * Makes a path shorter by keeping only some of the points.
@@ -209,71 +268,46 @@ public class Graph<T> {
 	 * @return A list of SuperPixel vertices that form the path from start to end.
 	 *         If no path is found or start/end is missing, returns an empty list.
 	 */
-	public GraphADT.ArrayList<Vertex<SuperPixel>> findPath() {
+	public ArrayList<Vertex<SuperPixel>> findPath() {
+	    ArrayList<Vertex<SuperPixel>> path = new ArrayList<>();
 
-	    // If start or end is not set, return an empty path
-	    if (startVertex == null || endVertex == null) 
-	    {
-	        return new GraphADT.ArrayList<Vertex<SuperPixel>>();
+	    if (startVertex == null || endVertex == null) {
+	        return path;
 	    }
 
-	    // A queue to store paths to explore
-		LinkedQueue<GraphADT.ArrayList<Vertex<SuperPixel>>> queue = new LinkedQueue<>();
+	    LinkedQueue<Vertex<SuperPixel>> queue = new LinkedQueue<>();
+	    ArrayList<Vertex<SuperPixel>> visited = new ArrayList<>();
+	    HashTable<Integer, Vertex<SuperPixel>> parent = new HashTable<>();
 
-	    // A list to keep track of visited vertices
-	    GraphADT.ArrayList<Vertex<SuperPixel>> visited = new GraphADT.ArrayList<Vertex<SuperPixel>>();
-	    // Start a new path from the start vertex
-	    GraphADT.ArrayList<Vertex<SuperPixel>> startPath = new GraphADT.ArrayList<>();
-	    startPath.add(startVertex);
-	    queue.Enqueue(startPath);        // Add the starting path to the queue
-	    visited.add(startVertex);        // Mark the start vertex as visited
+	    queue.Enqueue(startVertex);
+	    visited.add(startVertex);
+	    parent.put(startVertex.GetElement().getId(), null);
 
-	    // Keep going while there are paths to check
 	    while (!queue.isEmpty()) {
+	        Vertex<SuperPixel> current = queue.Dequeue();
 
-
-	        // Take the next path from the queue
-			GraphADT.ArrayList<Vertex<SuperPixel>> path = queue.Dequeue();
-
-	        // Get the last vertex in the current path
-	        Vertex<SuperPixel> v = path.get(path.size() - 1);
-
-	        // If we reached the end vertex, return the path
-	        if (v == endVertex) {
+	        if (current.equals(endVertex)) {
+	            for (Vertex<SuperPixel> node = current; node != null; node = parent.get(node.GetElement().getId())) {
+	                path.add(0, node);   
+	            }
 	            return path;
 	        }
 
-	        // Check all edges connected to this vertex
-	        for (Edge<SuperPixel> e : v.EdgeList()) {
+	        for (Edge<SuperPixel> edge : current.EdgeList()) {
+	            Vertex<SuperPixel> neighbor = edge.getVertFrom().equals(current)
+	                ? edge.getVertTO()
+	                : edge.getVertFrom();
 
-
-	            Vertex<SuperPixel> w;
-
-	            // Get the vertex on the other side of the edge
-	            if (e.getVertFrom() == v) {
-	                w = e.getVertTO();
-	            } else {
-	                w = e.getVertFrom();
-	            }
-
-	            // If we haven't visited this vertex yet
-	            if (!visited.contains(w)) {
-	                visited.add(w); // Mark it as visited
-
-	                // Create a new path that includes this vertex
-					GraphADT.ArrayList<Vertex<SuperPixel>> newPath = new GraphADT.ArrayList<Vertex<SuperPixel>>(path);
-	                newPath.add(w);
-
-	                // Add the new path to the queue to be explored later
-	                queue.Enqueue(newPath);
+	            if (!visited.contains(neighbor)) {
+	                visited.add(neighbor);
+	                parent.put(neighbor.GetElement().getId(), current);
+	                queue.Enqueue(neighbor);
 	            }
 	        }
 	    }
 
-	    // If no path is found, return an empty list
-		return new GraphADT.ArrayList<Vertex<SuperPixel>>();
+	    return path;
 	}
-
 
 	/**
 	 * Method for getting the starting vertex

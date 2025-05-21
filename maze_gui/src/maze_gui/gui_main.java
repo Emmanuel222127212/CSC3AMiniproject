@@ -77,6 +77,7 @@ public class gui_main extends Application{
 		Scene startScene = new Scene(start);
 
 		startScene.getStylesheets().add("/styles/try.css");
+		mainScene.getStylesheets().add("/styles/menu.css");
 
 		//Start button
 
@@ -98,8 +99,6 @@ public class gui_main extends Application{
 	}
 	
 	public static void main(String[] args) {
-		
-
 
 		launch(args);
 	}
